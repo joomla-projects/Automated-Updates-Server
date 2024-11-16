@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use App\Services\SiteConnectionService;
+use Illuminate\Database\Eloquent\Model;
 
-class Site extends Authenticatable
+class Site extends Model
 {
     protected $fillable = [
         'url',
@@ -33,5 +34,15 @@ class Site extends Authenticatable
             'update_minor' => 'bool',
             'update_major' => 'bool'
         ];
+    }
+
+    public function getUrlAttribute(string $value): string
+    {
+        return rtrim($value, "/") . "/";
+    }
+
+    public function getConnectionAttribute(): SiteConnectionService
+    {
+        return new SiteConnectionService($this->url, $this->key);
     }
 }
