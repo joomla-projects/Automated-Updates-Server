@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enum\HttpMethod;
+use App\Enum\WebserviceEndpoint;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
@@ -16,7 +17,61 @@ class SiteConnectionService
     {
     }
 
-    protected function performRequest(
+    public function checkHealth(): array
+    {
+        $healthData = $this->performWebserviceRequest(
+            HttpMethod::GET,
+            WebserviceEndpoint::HEALTH_CHECK
+        );
+
+        // Perform a sanity check
+        if (empty($healthData['cms_version'])) {
+            throw new \Exception("Invalid health response content");
+        }
+
+        return $healthData;
+    }
+
+    public function performExtractionRequest(array $data): array
+    {
+        $request = new Request(
+            'POST',
+            $this->baseUrl . 'extract.php'
+        );
+
+        $data['password'] = $this->key;
+
+        return $this->performHttpRequest(
+            $request,
+            [
+                'form_params' => $data,
+                'timeout' => 300.0
+            ]
+        );
+    }
+
+    protected function performWebserviceRequest(
+        HttpMethod $method,
+        WebserviceEndpoint $endpoint,
+        array $data = []
+    ): array {
+        $request = new Request(
+            $method->name,
+            $this->baseUrl . $endpoint->value,
+            [
+                'Authorization' => 'JUpdate-Token ' . $this->key
+            ]
+        );
+
+        return $this->performHttpRequest(
+            $request,
+            [
+                "json" => $data
+            ]
+        );
+    }
+
+    protected function performHttpRequest(
         RequestInterface $request,
         array $options = []
     ): array {
@@ -44,42 +99,6 @@ class SiteConnectionService
             true,
             512,
             JSON_THROW_ON_ERROR
-        );
-    }
-
-    public function performExtractionRequest(array $data): array
-    {
-        $request = new Request(
-            'POST',
-            $this->baseUrl . 'extract.php'
-        );
-
-        $data['password'] = $this->key;
-
-        return $this->performRequest(
-            $request,
-            [
-                'form_params' => $data,
-                'timeout' => 300.0
-            ]
-        );
-    }
-
-    public function performWebserviceRequest(HttpMethod $method, string $endpoint, array $data = []): array
-    {
-        $request = new Request(
-            $method->name,
-            $this->baseUrl . $endpoint,
-            [
-                'Authorization' => 'JUpdate-Token ' . $this->key
-            ]
-        );
-
-        return $this->performRequest(
-            $request,
-            [
-                "json" => $data
-            ]
         );
     }
 }

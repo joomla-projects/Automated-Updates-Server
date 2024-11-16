@@ -29,17 +29,9 @@ class CheckSiteHealth implements ShouldQueue
         /** @var SiteConnectionService $connection */
         $connection = $this->site->connection;
 
-        $response = $connection->performWebserviceRequest(
-            HttpMethod::GET,
-            WebserviceEndpoints::HEALTH_CHECK->value
-        );
+        $response = $connection->checkHealth();
 
         $healthData = collect($response);
-
-        // Perform a sanity check
-        if (!$healthData->has('cms_version')) {
-            throw new \Exception("Invalid health response content");
-        }
 
         // Write updated data to DB
         $this->site->update(

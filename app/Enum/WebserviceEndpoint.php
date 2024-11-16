@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum WebserviceEndpoints: string
+enum WebserviceEndpoint: string
 {
     case HEALTH_CHECK = "health.json";
 }
