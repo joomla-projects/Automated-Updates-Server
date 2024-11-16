@@ -1,4 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Queue\Console\PruneFailedJobsCommand;
+
+Schedule::command(PruneFailedJobsCommand::class)->daily();

@@ -1,0 +1,48 @@
+<?php declare(strict_types=1);
+
+namespace App\Jobs;
+
+use App\Enum\HttpMethod;
+use App\Models\Site;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+
+class CheckSiteHealth implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(protected readonly Site $site)
+    {
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        $response = $this->site->performWebserviceRequest(
+            HttpMethod::GET,
+            'health.json'
+        );
+
+        $healthData = collect($response);
+
+        // Perform a sanity check
+        if (!$healthData->has('cms_version')) {
+            throw new \Exception("Invalid health response content");
+        }
+
+        // Write updated data to DB
+        $this->site->update($healthData->only([
+            'php_version',
+            'db_type',
+            'db_version',
+            'cms_version',
+            'server_os'
+        ])->toArray());
+    }
+}
