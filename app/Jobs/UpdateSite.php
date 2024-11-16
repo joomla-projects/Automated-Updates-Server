@@ -75,6 +75,7 @@ class UpdateSite implements ShouldQueue
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
     {
+        /** Create a separate connection with the extraction password **/
         $connection = App::make(Connection::class, [
             $this->site->url,
             $prepareResult->password
@@ -100,7 +101,7 @@ class UpdateSite implements ShouldQueue
                 );
             }
 
-            // Make next backup step
+            // Make next extraction step
             $stepResult = $connection->performExtractionRequest(
                 [
                     "task" => "stepExtract",
