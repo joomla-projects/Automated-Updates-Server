@@ -109,8 +109,7 @@ class SiteController extends Controller
 
         try {
             Site::where('url', $url)->where('key', $key)->delete();
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }
 
