@@ -92,7 +92,7 @@ class UpdateSiteTest extends TestCase
             ]
         );
 
-        App::bind(Connection::class, fn() => $this->getSuccessfulExtractionMock());
+        App::bind(Connection::class, fn () => $this->getSuccessfulExtractionMock());
 
         $object = new UpdateSite($site, "1.0.1");
         $object->handle();
