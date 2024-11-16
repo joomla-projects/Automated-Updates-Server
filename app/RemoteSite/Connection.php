@@ -30,7 +30,7 @@ class Connection
         return HealthCheckResponse::from($healthData['data']['attributes']);
     }
 
-    public function performExtractionRequest(array $data): array
+    public function performExtractionRequest(array $requestData): array
     {
         $request = new Request(
             'POST',
@@ -39,19 +39,24 @@ class Connection
 
         $data['password'] = $this->key;
 
-        return $this->performHttpRequest(
+        // Get result
+        $response = $this->performHttpRequest(
             $request,
             [
-                'form_params' => $data,
+                'form_params' => $requestData,
                 'timeout' => 300.0
             ]
         );
+
+        $responseData = $this->decodeResponse($response, $request);
+
+        return $responseData;
     }
 
     protected function performWebserviceRequest(
         HttpMethod $method,
         WebserviceEndpoint $endpoint,
-        array $data = []
+        array $requestData = []
     ): array {
         $request = new Request(
             $method->name,
@@ -61,18 +66,32 @@ class Connection
             ]
         );
 
-        return $this->performHttpRequest(
+        // Get result
+        $response = $this->performHttpRequest(
             $request,
             [
-                "json" => $data
+                "json" => $requestData
             ]
         );
+
+        $responseData = $this->decodeResponse($response, $request);
+
+        // Make sure it matches the Joomla webservice response format
+        if (empty($responseData['data']['attributes'])) {
+            throw new RequestException(
+                "Invalid JSON format",
+                $request,
+                $response
+            );
+        }
+
+        return $responseData;
     }
 
     protected function performHttpRequest(
         RequestInterface $request,
         array $options = []
-    ): array {
+    ): Response {
         /** @var Client $httpClient */
         $httpClient = App::make(Client::class);
 
@@ -91,8 +110,13 @@ class Connection
             );
         }
 
-        // Decode body
-        $return = json_decode(
+        return $response;
+    }
+
+    protected function decodeResponse(Response $response, Request $request): array
+    {
+        // Decode
+        $data = json_decode(
             (string) $response->getBody(),
             true,
             512,
@@ -100,7 +124,7 @@ class Connection
         );
 
         // Make sure it's an array
-        if (!is_array($return)) {
+        if (!is_array($data)) {
             throw new RequestException(
                 "Invalid JSON body",
                 $request,
@@ -108,6 +132,6 @@ class Connection
             );
         }
 
-        return $return;
+        return $data;
     }
 }
