@@ -116,6 +116,7 @@ class UpdateSiteTest extends TestCase
         $siteMock->method('getConnectionAttribute')->willReturn($connectionMock);
         $siteMock->method('getFrontendStatus')->willReturn(200);
         $siteMock->id = 1;
+        $siteMock->url = "http://example.org";
 
         return $siteMock;
     }
