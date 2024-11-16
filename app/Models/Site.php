@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\RemoteSite\Connection;
+use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 
 class Site extends Model
 {
@@ -44,5 +46,13 @@ class Site extends Model
     public function getConnectionAttribute(): Connection
     {
         return new Connection($this->url, $this->key);
+    }
+
+    public function getFrontendStatus(): int
+    {
+        /** @var Client $httpClient */
+        $httpClient = App::make(Client::class);
+
+        return $httpClient->get($this->url)->getStatusCode();
     }
 }
