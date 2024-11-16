@@ -29,10 +29,10 @@ class SiteController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $url = $request->input('url');
-        $key = $request->input('key');
+        $url = $request->string('url');
+        $key = $request->string('key');
 
-        if (empty($url) || empty($key)) {
+        if ($url === '' && $key === '') {
             return $this->error('BadRequest');
         }
 
