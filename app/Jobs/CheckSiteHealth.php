@@ -2,11 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Enum\HttpMethod;
-use App\Enum\WebserviceEndpoints;
 use App\Models\Site;
 use App\Services\SiteConnectionService;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
