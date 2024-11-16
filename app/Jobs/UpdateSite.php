@@ -9,6 +9,7 @@ use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
 class UpdateSite implements ShouldQueue
@@ -74,6 +75,45 @@ class UpdateSite implements ShouldQueue
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
     {
+        $connection = App::make(Connection::class, [
+            $this->site->url,
+            $prepareResult->password
+        ]);
 
+        // Ping server
+        $pingResult = $connection->performExtractionRequest(["task" => "ping"]);
+
+        if (empty($pingResult["message"]) || $pingResult["message"] === 'Invalid login') {
+            throw new \Exception(
+                "Invalid ping response for site: " . $this->site->id
+            );
+        }
+
+        // Start extraction
+        $stepResult = $connection->performExtractionRequest(["task" => "startExtract"]);
+
+        // Run actual core update
+        while (array_key_exists("done", $stepResult) && $stepResult["done"] !== true) {
+            if ($stepResult["status"] !== true) {
+                throw new \Exception(
+                    "Invalid extract response for site: " . $this->site->id
+                );
+            }
+
+            // Make next backup step
+            $stepResult = $connection->performExtractionRequest(
+                [
+                    "task" => "stepExtract",
+                    "instance" => $stepResult["instance"]
+                ]
+            );
+        }
+
+        // Clean up restore
+        $connection->performExtractionRequest(
+            [
+                "task" => "finalizeUpdate"
+            ]
+        );
     }
 }
