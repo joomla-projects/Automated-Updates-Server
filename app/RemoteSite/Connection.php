@@ -6,7 +6,6 @@ namespace App\RemoteSite;
 
 use App\Enum\HttpMethod;
 use App\Enum\WebserviceEndpoint;
-use App\RemoteSite\Responses\HealthCheck;
 use App\RemoteSite\Responses\HealthCheck as HealthCheckResponse;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -21,14 +20,14 @@ class Connection
     {
     }
 
-    public function checkHealth(): HealthCheck
+    public function checkHealth(): HealthCheckResponse
     {
         $healthData = $this->performWebserviceRequest(
             HttpMethod::GET,
             WebserviceEndpoint::HEALTH_CHECK
         );
 
-        return HealthCheckResponse::from($healthData);
+        return HealthCheckResponse::from($healthData['data']['attributes']);
     }
 
     public function performExtractionRequest(array $data): array
@@ -58,7 +57,7 @@ class Connection
             $method->name,
             $this->baseUrl . $endpoint->value,
             [
-                'Authorization' => 'JUpdate-Token ' . $this->key
+                'X-JUpdate-Token' => $this->key
             ]
         );
 

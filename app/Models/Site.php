@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Remotesite\Connection;
+use App\RemoteSite\Connection;
 use Illuminate\Database\Eloquent\Model;
 
 class Site extends Model

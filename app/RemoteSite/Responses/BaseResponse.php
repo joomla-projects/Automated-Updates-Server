@@ -4,7 +4,7 @@ namespace App\RemoteSite\Responses;
 
 abstract class BaseResponse
 {
-    public static function from(array $data): self
+    public static function from(array $data): static
     {
         $reflect = new \ReflectionClass(static::class);
         $properties = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
@@ -20,5 +20,10 @@ abstract class BaseResponse
         }
 
         return $reflect->newInstanceArgs($arguments);
+    }
+
+    public function toArray(): array
+    {
+        return get_object_vars($this);
     }
 }

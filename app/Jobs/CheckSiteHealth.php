@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Site;
-use app\Remotesite\Connection;
+use App\RemoteSite\Connection;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -29,19 +29,11 @@ class CheckSiteHealth implements ShouldQueue
         /** @var Connection $connection */
         $connection = $this->site->connection;
 
-        $response = $connection->checkHealth();
-
-        $healthData = collect($response);
+        $healthData = $connection->checkHealth();
 
         // Write updated data to DB
         $this->site->fill(
-            $healthData->only([
-                'php_version',
-                'db_type',
-                'db_version',
-                'cms_version',
-                'server_os'
-            ])->toArray()
+            $healthData->toArray()
         );
 
         // @phpstan-ignore-next-line
