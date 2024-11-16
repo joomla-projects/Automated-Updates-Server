@@ -73,7 +73,7 @@ class UpdateSite implements ShouldQueue
         }
     }
 
-    protected function performExtraction(PrepareUpdate $prepareResult)
+    protected function performExtraction(PrepareUpdate $prepareResult): void
     {
 
     }

@@ -41,8 +41,6 @@ enum WebserviceEndpoint: string
             case self::finalizeUpdate->name:
                 return FinalizeUpdate::class;
         }
-
-        throw new \ValueError("No method defined");
     }
 
     public function getUrl(): string
