@@ -53,6 +53,8 @@ class SiteController extends Controller
         $site->key = $key;
         $site->url = $url;
 
+        $site->save();
+
         CheckSiteHealth::dispatch($site);
 
         return $this->ok();
