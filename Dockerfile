@@ -11,8 +11,8 @@ RUN install-php-extensions \
     curl \
     redis
 
-RUN composer install
-
 COPY . /app
+
+RUN composer install
 
 ENTRYPOINT ["php", "artisan", "octane:frankenphp"]
