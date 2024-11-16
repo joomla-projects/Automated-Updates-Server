@@ -7,6 +7,7 @@ use App\Jobs\CheckSiteHealth;
 use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\JsonResponse;
@@ -52,6 +53,9 @@ class SiteController extends Controller
 
         $site->key = $key;
         $site->url = $url;
+        $site->last_seen = Carbon::now();
+
+        // Fill with site info
         $site->fill($healthResponse->toArray());
 
         $site->save();
