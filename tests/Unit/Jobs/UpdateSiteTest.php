@@ -9,6 +9,7 @@ use App\RemoteSite\Responses\FinalizeUpdate;
 use App\RemoteSite\Responses\GetUpdate;
 use App\RemoteSite\Responses\HealthCheck;
 use App\RemoteSite\Responses\PrepareUpdate;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
@@ -91,6 +92,8 @@ class UpdateSiteTest extends TestCase
             ]
         );
 
+        App::bind(Connection::class, fn() => $this->getSuccessfulExtractionMock());
+
         $object = new UpdateSite($site, "1.0.1");
         $object->handle();
     }
@@ -162,5 +165,31 @@ class UpdateSiteTest extends TestCase
             ...$defaults,
             ...$overrides
         ]);
+    }
+
+    protected function getSuccessfulExtractionMock()
+    {
+        $connectionMock = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $connectionMock
+            ->method("performExtractionRequest")
+            ->willReturnCallback(
+                function ($data) {
+                    switch ($data["task"]) {
+                        case "ping":
+                            return ["message" => "Success"];
+
+                        case "startExtract":
+                            return ["done" => true];
+
+                        case "finalizeUpdate":
+                            return ["success" => true];
+                    }
+                }
+            );
+
+        return $connectionMock;
     }
 }

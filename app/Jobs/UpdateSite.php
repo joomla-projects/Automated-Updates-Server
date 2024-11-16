@@ -76,9 +76,9 @@ class UpdateSite implements ShouldQueue
     protected function performExtraction(PrepareUpdate $prepareResult): void
     {
         /** Create a separate connection with the extraction password **/
-        $connection = App::make(Connection::class, [
-            $this->site->url,
-            $prepareResult->password
+        $connection = App::makeWith(Connection::class, [
+            "baseUrl" => $this->site->url,
+            "key" => $prepareResult->password
         ]);
 
         // Ping server
