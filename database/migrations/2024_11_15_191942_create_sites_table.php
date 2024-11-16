@@ -15,7 +15,7 @@ return new class () extends Migration {
             $table->string('url')->index();
             $table->string('key');
             $table->string('php_version');
-            $table->string('ddb_type');
+            $table->string('db_type');
             $table->string('db_version');
             $table->string('cms_version')->index();
             $table->string('server_os');
