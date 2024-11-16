@@ -40,7 +40,7 @@ class SiteController extends Controller
 
         // Do a health check
         try {
-            $connectionService->checkHealth();
+            $healthResponse = $connectionService->checkHealth();
         } catch (ServerException $e) {
             return $this->error($e->getMessage(), 500);
         } catch (ClientException|\Exception $e) {
@@ -52,6 +52,7 @@ class SiteController extends Controller
 
         $site->key = $key;
         $site->url = $url;
+        $site->fill($healthResponse->toArray());
 
         $site->save();
 
