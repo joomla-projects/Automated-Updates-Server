@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateSite implements ShouldQueue
 {
-    protected int $preUpdateCode;
-
     use Queueable;
+    protected int $preUpdateCode;
 
     /**
      * Create a new job instance.

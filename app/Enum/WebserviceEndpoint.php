@@ -21,6 +21,7 @@ enum WebserviceEndpoint: string
             case self::getUpdate->name:
                 return HttpMethod::GET;
 
+                // no break
             case self::prepareUpdate->name:
             case self::finalizeUpdate->name:
                 return HttpMethod::POST;
