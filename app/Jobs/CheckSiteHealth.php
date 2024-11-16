@@ -41,12 +41,14 @@ class CheckSiteHealth implements ShouldQueue
         }
 
         // Write updated data to DB
-        $this->site->update($healthData->only([
-            'php_version',
-            'db_type',
-            'db_version',
-            'cms_version',
-            'server_os'
-        ])->toArray());
+        $this->site->update(
+            $healthData->only([
+                'php_version',
+                'db_type',
+                'db_version',
+                'cms_version',
+                'server_os'
+            ])->toArray()
+        );
     }
 }
