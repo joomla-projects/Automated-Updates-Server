@@ -1,8 +1,8 @@
 <?php
 
-namespace App\RemoteSite\Responses;
+namespace App\DTO;
 
-abstract class BaseResponse
+abstract class BaseDTO
 {
     public static function from(array $data): static
     {
