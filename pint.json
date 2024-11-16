@@ -1,6 +1,6 @@
 {
   "preset": "psr12",
-    "notName": [
-        "WebserviceEndpoint.php"
-    ]
+  "notName": [
+    "WebserviceEndpoint.php"
+  ]
 }
