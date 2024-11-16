@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Enum\HttpMethod;
+use App\Enum\WebserviceEndpoints;
 use App\Models\Site;
 use App\Services\SiteConnectionService;
 use GuzzleHttp\Exception\RequestException;
@@ -30,7 +31,7 @@ class CheckSiteHealth implements ShouldQueue
 
         $response = $connection->performWebserviceRequest(
             HttpMethod::GET,
-            'health.json'
+            WebserviceEndpoints::HEALTH_CHECK->value
         );
 
         $healthData = collect($response);
