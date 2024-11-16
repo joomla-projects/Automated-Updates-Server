@@ -2,7 +2,9 @@
 
 namespace App\RemoteSite\Responses;
 
-class HealthCheck extends BaseResponse
+use App\DTO\BaseDTO;
+
+class HealthCheck extends BaseDTO
 {
     public function __construct(
         public string $php_version,
