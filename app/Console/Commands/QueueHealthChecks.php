@@ -34,7 +34,11 @@ class QueueHealthChecks extends Command
         $this->output->writeln('Pushing pending health checks');
 
         Site::query()
-            ->whereDate('last_seen', '<', Carbon::now()->subHours(env('HEALTH_CHECK_INTERVAL', 24)))
+            ->whereDate(
+                'last_seen',
+                '<',
+                Carbon::now()->subHours((int) config('autoupdates.healthcheck_interval')) // @phpstan-ignore-line
+            )
             ->chunkById(
                 100,
                 function (Collection $chunk) {
@@ -44,7 +48,7 @@ class QueueHealthChecks extends Command
                     $this->totalPushed += $chunk->count();
 
                     // Push each site check to queue
-                    $chunk->each(fn($site) => CheckSiteHealth::dispatch($site));
+                    $chunk->each(fn ($site) => CheckSiteHealth::dispatch($site));
                 }
             );
 

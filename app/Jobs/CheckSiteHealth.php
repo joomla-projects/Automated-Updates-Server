@@ -44,6 +44,7 @@ class CheckSiteHealth implements ShouldQueue
             ])->toArray()
         );
 
+        // @phpstan-ignore-next-line
         $this->site->last_seen = Carbon::now();
         $this->site->save();
     }
