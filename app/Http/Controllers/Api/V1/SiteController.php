@@ -33,7 +33,7 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        if ($url->isEmpty() && $key->isEmpty()) {
+        if ($url->isEmpty() || $key->isEmpty()) {
             return $this->error('BadRequest');
         }
 
@@ -72,7 +72,25 @@ class SiteController extends Controller
      */
     public function check(Request $request): JsonResponse
     {
-        return response()->json(['check']);
+        $url = $request->string('url');
+        $key = $request->string('key');
+
+        if ($url->isEmpty() || $key->isEmpty()) {
+            return $this->error('BadRequest');
+        }
+
+        $connectionService = new Connection($url, $key);
+
+        // Do a health check
+        try {
+            $connectionService->checkHealth();
+        } catch (ServerException $e) {
+            return $this->error($e->getMessage(), 500);
+        } catch (ClientException|\Exception $e) {
+            return $this->error($e->getMessage());
+        }
+
+        return $this->ok();
     }
 
     /**
@@ -82,6 +100,20 @@ class SiteController extends Controller
      */
     public function delete(Request $request): JsonResponse
     {
-        return response()->json(['delete']);
+        $url = $request->string('url');
+        $key = $request->string('key');
+
+        if ($url->isEmpty() || $key->isEmpty()) {
+            return $this->error('BadRequest');
+        }
+
+        try {
+            Site::where('url', $url)->where('key', $key)->delete();
+        }
+        catch (\Exception $e) {
+            return $this->error($e->getMessage());
+        }
+
+        return $this->ok();
     }
 }
