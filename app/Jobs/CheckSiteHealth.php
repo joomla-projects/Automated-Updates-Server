@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enum\HttpMethod;
 use App\Models\Site;
+use App\Services\SiteConnectionService;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -24,7 +25,10 @@ class CheckSiteHealth implements ShouldQueue
      */
     public function handle(): void
     {
-        $response = $this->site->performWebserviceRequest(
+        /** @var SiteConnectionService $connection */
+        $connection = $this->site->connection;
+
+        $response = $connection->performWebserviceRequest(
             HttpMethod::GET,
             'health.json'
         );
