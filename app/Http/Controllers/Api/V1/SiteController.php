@@ -32,7 +32,7 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        if ($url === '' && $key === '') {
+        if ($url->isEmpty() && $key->isEmpty()) {
             return $this->error('BadRequest');
         }
 
@@ -67,8 +67,6 @@ class SiteController extends Controller
      */
     public function check(Request $request): JsonResponse
     {
-
-
         return response()->json(['check']);
     }
 
