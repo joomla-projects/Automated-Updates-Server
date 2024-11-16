@@ -71,6 +71,11 @@ class UpdateSite implements ShouldQueue
         if (!$connection->finalizeUpdate()->success) {
             throw new \Exception("Update for site failed in postprocessing: " . $this->site->id);
         }
+
+        // Compare codes
+        if ($this->site->getFrontendStatus() !== $this->preUpdateCode) {
+            throw new \Exception("Status code has changed after update for site: " . $this->site->id);
+        }
     }
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
