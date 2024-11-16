@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Jobs\CheckSiteHealth;
 use App\Models\Site;
-use App\Services\SiteConnectionService;
+use App\RemoteSite\Connection;
 use App\Traits\ApiResponse;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -36,10 +36,10 @@ class SiteController extends Controller
             return $this->error('BadRequest');
         }
 
-        $connectionService = new SiteConnectionService($url, $key);
+        $connectionService = new Connection($url, $key);
 
         // Do a health check
-        try{
+        try {
             $connectionService->checkHealth();
         } catch (ServerException $e) {
             return $this->error($e->getMessage(), 500);
@@ -48,7 +48,7 @@ class SiteController extends Controller
         }
 
         // If successful save site
-        $site = new Site;
+        $site = new Site();
 
         $site->key = $key;
         $site->url = $url;
