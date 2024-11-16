@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Models\Site;
 use App\Services\SiteConnectionService;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -33,7 +34,7 @@ class CheckSiteHealth implements ShouldQueue
         $healthData = collect($response);
 
         // Write updated data to DB
-        $this->site->update(
+        $this->site->fill(
             $healthData->only([
                 'php_version',
                 'db_type',
@@ -42,5 +43,9 @@ class CheckSiteHealth implements ShouldQueue
                 'server_os'
             ])->toArray()
         );
+
+        // @phpstan-ignore-next-line
+        $this->site->last_seen = Carbon::now();
+        $this->site->save();
     }
 }

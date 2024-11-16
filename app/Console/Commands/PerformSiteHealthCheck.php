@@ -25,10 +25,13 @@ class PerformSiteHealthCheck extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
-        CheckSiteHealth::dispatchSync(
-            Site::findOrFail($this->input->getArgument('siteId'))
-        );
+        /** @var Site $site */
+        $site = Site::findOrFail($this->input->getArgument('siteId'));
+
+        CheckSiteHealth::dispatchSync($site);
+
+        return Command::SUCCESS;
     }
 }

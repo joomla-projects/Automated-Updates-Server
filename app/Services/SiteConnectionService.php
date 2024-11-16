@@ -95,12 +95,23 @@ class SiteConnectionService
             );
         }
 
-        // Return decoded body
-        return json_decode(
+        // Decode body
+        $return = json_decode(
             (string) $response->getBody(),
             true,
             512,
             JSON_THROW_ON_ERROR
         );
+
+        // Make sure it's an array
+        if (!is_array($return)) {
+            throw new RequestException(
+                "Invalid JSON body",
+                $request,
+                $response
+            );
+        }
+
+        return $return;
     }
 }
