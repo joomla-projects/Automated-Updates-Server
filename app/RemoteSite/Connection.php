@@ -6,7 +6,11 @@ namespace App\RemoteSite;
 
 use App\Enum\HttpMethod;
 use App\Enum\WebserviceEndpoint;
+use App\RemoteSite\Responses\FinalizeUpdate as FinalizeUpdateResponse;
 use App\RemoteSite\Responses\HealthCheck as HealthCheckResponse;
+use App\RemoteSite\Responses\GetUpdate as GetUpdateResponse;
+use App\RemoteSite\Responses\PrepareUpdate as PrepareUpdateResponse;
+use App\RemoteSite\Responses\ResponseInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
@@ -14,27 +18,43 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\App;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * @method  HealthCheckResponse checkHealth()
+ * @method  GetUpdateResponse getUpdate()
+ * @method  PrepareUpdateResponse prepareUpdate(string $targetVersion)
+ * @method  FinalizeUpdateResponse finalizeUpdate()
+ */
 class Connection
 {
     public function __construct(protected readonly string $baseUrl, protected readonly string $key)
     {
     }
 
-    public function checkHealth(): HealthCheckResponse
+    public function __call(string $method, array $arguments): ResponseInterface
     {
-        $healthData = $this->performWebserviceRequest(
-            HttpMethod::GET,
-            WebserviceEndpoint::HEALTH_CHECK
+        $endpoint = WebserviceEndpoint::tryFromName($method);
+
+        if (is_null($endpoint)) {
+            throw new \BadMethodCallException();
+        }
+
+        // Call
+        $data = $this->performWebserviceRequest(
+            $endpoint->getMethod(),
+            $endpoint->getUrl(),
+            ...$arguments
         );
 
-        return HealthCheckResponse::from($healthData['data']['attributes']);
+        $responseClass = $endpoint->getResponseClass();
+
+        return $responseClass::from($data);
     }
 
     public function performExtractionRequest(array $requestData): array
     {
         $request = new Request(
             'POST',
-            $this->baseUrl . 'extract.php'
+            $this->baseUrl . '/extract.php'
         );
 
         $data['password'] = $this->key;
@@ -55,12 +75,12 @@ class Connection
 
     protected function performWebserviceRequest(
         HttpMethod $method,
-        WebserviceEndpoint $endpoint,
+        string $endpoint,
         array $requestData = []
     ): array {
         $request = new Request(
             $method->name,
-            $this->baseUrl . $endpoint->value,
+            $this->baseUrl . $endpoint,
             [
                 'X-JUpdate-Token' => $this->key
             ]
@@ -85,7 +105,7 @@ class Connection
             );
         }
 
-        return $responseData;
+        return $responseData['data']['attributes'];
     }
 
     protected function performHttpRequest(
