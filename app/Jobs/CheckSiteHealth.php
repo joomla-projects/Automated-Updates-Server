@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Site;
-use App\Services\SiteConnectionService;
+use app\Remotesite\Connection;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -26,7 +26,7 @@ class CheckSiteHealth implements ShouldQueue
      */
     public function handle(): void
     {
-        /** @var SiteConnectionService $connection */
+        /** @var Connection $connection */
         $connection = $this->site->connection;
 
         $response = $connection->checkHealth();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Services\SiteConnectionService;
+use App\Remotesite\Connection;
 use Illuminate\Database\Eloquent\Model;
 
 class Site extends Model
@@ -38,11 +38,11 @@ class Site extends Model
 
     public function getUrlAttribute(string $value): string
     {
-        return rtrim($value, "/") . "/";
+        return rtrim($value, "/");
     }
 
-    public function getConnectionAttribute(): SiteConnectionService
+    public function getConnectionAttribute(): Connection
     {
-        return new SiteConnectionService($this->url, $this->key);
+        return new Connection($this->url, $this->key);
     }
 }

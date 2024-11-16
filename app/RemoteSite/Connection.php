@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\RemoteSite;
 
 use App\Enum\HttpMethod;
 use App\Enum\WebserviceEndpoint;
+use App\RemoteSite\Responses\HealthCheck;
+use App\RemoteSite\Responses\HealthCheck as HealthCheckResponse;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
@@ -13,25 +15,20 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\App;
 use Psr\Http\Message\RequestInterface;
 
-class SiteConnectionService
+class Connection
 {
     public function __construct(protected readonly string $baseUrl, protected readonly string $key)
     {
     }
 
-    public function checkHealth(): array
+    public function checkHealth(): HealthCheck
     {
         $healthData = $this->performWebserviceRequest(
             HttpMethod::GET,
             WebserviceEndpoint::HEALTH_CHECK
         );
 
-        // Perform a sanity check
-        if (empty($healthData['cms_version'])) {
-            throw new \Exception("Invalid health response content");
-        }
-
-        return $healthData;
+        return HealthCheckResponse::from($healthData);
     }
 
     public function performExtractionRequest(array $data): array
