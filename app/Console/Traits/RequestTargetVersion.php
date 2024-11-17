@@ -12,7 +12,7 @@ trait RequestTargetVersion
 
         $targetVersion = $this->choice(
             "What's the target version?",
-            $releases->map(fn($release) => $release["version"])->values()->toArray()
+            $releases->map(fn ($release) => $release["version"])->values()->toArray()
         );
 
         return $targetVersion;

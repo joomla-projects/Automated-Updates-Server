@@ -10,9 +10,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class QueueUpdates extends Command
 {
-    protected int $totalPushed = 0;
-
     use RequestTargetVersion;
+    protected int $totalPushed = 0;
 
     /**
      * The name and signature of the console command.
