@@ -17,7 +17,10 @@ class TufFetcher
         $this->updateStorage = App::make(StorageInterface::class);
     }
 
-    public function getReleases(): mixed
+    /**
+     * @return Collection
+     */
+    public function getReleases(): Collection
     {
         // Cache response to avoid to make constant calls on the fly
         return Cache::remember(
@@ -42,5 +45,14 @@ class TufFetcher
                     });
             }
         );
+    }
+
+    public function getLatestVersionForBranch(int $branch): string
+    {
+        return $this->getReleases()->filter(function ($release) {
+                return $release["stability"] === "Stable";
+            })->sort(function ($releaseA, $releaseB) {
+                return version_compare($releaseA["version"], $releaseB["version"], '<');
+            })->pluck('version')->first();
     }
 }
