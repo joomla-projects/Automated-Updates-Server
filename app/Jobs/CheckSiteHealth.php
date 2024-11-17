@@ -10,6 +10,7 @@ use App\TUF\TufFetcher;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\App;
 
 class CheckSiteHealth implements ShouldQueue
 {
@@ -42,7 +43,9 @@ class CheckSiteHealth implements ShouldQueue
         $this->site->save();
 
         // Check if a newer Joomla version for that site is available
-        $latestVersion = (new TufFetcher())->getLatestVersionForBranch((int) $this->site->cms_version[0]);
+        /** @var TufFetcher $tufFetcher */
+        $tufFetcher = App::make(TufFetcher::class);
+        $latestVersion = $tufFetcher->getLatestVersionForBranch((int) $this->site->cms_version[0]);
 
         // Available version is not newer, exit
         if (!version_compare($latestVersion, $this->site->cms_version, ">")) {
