@@ -10,7 +10,6 @@ use App\TUF\TufFetcher;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Str;
 
 class CheckSiteHealth implements ShouldQueue
 {

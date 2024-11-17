@@ -50,9 +50,9 @@ class TufFetcher
     public function getLatestVersionForBranch(int $branch): string
     {
         return $this->getReleases()->filter(function ($release) {
-                return $release["stability"] === "Stable";
-            })->sort(function ($releaseA, $releaseB) {
-                return version_compare($releaseA["version"], $releaseB["version"], '<');
-            })->pluck('version')->first();
+            return $release["stability"] === "Stable";
+        })->sort(function ($releaseA, $releaseB) {
+            return version_compare($releaseA["version"], $releaseB["version"], '<');
+        })->pluck('version')->first();
     }
 }
