@@ -2,7 +2,6 @@
 
 namespace App\TUF;
 
-use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
