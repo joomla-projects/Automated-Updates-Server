@@ -13,6 +13,6 @@ RUN install-php-extensions \
 
 COPY . /app
 
-RUN composer install
+RUN composer install --no-dev
 
 ENTRYPOINT ["php", "artisan", "octane:frankenphp"]

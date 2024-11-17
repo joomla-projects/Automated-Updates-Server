@@ -7,12 +7,11 @@ use App\Http\Requests\SiteRequest;
 use App\Jobs\CheckSiteHealth;
 use App\Models\Site;
 use App\RemoteSite\Connection;
-use App\Traits\ApiResponse;
+use App\Http\Traits\ApiResponse;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 
 /**
