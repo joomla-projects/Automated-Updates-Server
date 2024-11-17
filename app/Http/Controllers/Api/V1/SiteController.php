@@ -13,6 +13,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class SiteController
@@ -34,7 +35,7 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        $connectionService = new Connection($url, $key);
+        $connectionService = App::makeWith(Connection::class, [$url, $key]);
 
         // Do a health check
         try {
