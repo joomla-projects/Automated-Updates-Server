@@ -39,7 +39,7 @@ class SiteControllerTest extends TestCase
             "server_os" => "Joomla OS 1.0.0"
         ]));
 
-        $this->app->bind(Connection::class, fn() => $mock);
+        $this->app->bind(Connection::class, fn () => $mock);
 
         $response = $this->postJson(
             '/api/v1/register',
@@ -64,7 +64,7 @@ class SiteControllerTest extends TestCase
 
         $mock->method('__call')->willThrowException(new \Exception());
 
-        $this->app->bind(Connection::class, fn() => $mock);
+        $this->app->bind(Connection::class, fn () => $mock);
 
         $response = $this->postJson(
             '/api/v1/register',

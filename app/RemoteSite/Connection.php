@@ -70,7 +70,7 @@ class Connection
         return $this->decodeResponse($response, $request);
     }
 
-    protected function performWebserviceRequest(
+    public function performWebserviceRequest(
         HttpMethod $method,
         string $endpoint,
         ?array $requestData = null
