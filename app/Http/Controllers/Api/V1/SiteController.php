@@ -34,7 +34,7 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        $connectionService = App::makeWith(Connection::class, [$url, $key]);
+        $connectionService = App::makeWith(Connection::class, ["baseUrl" => $url, "key" => $key]);
 
         // Do a health check
         try {
@@ -49,7 +49,7 @@ class SiteController extends Controller
         $site = new Site();
 
         $site->key = $key;
-        $site->url = $url;
+        $site->url = rtrim($url, "/");
         $site->last_seen = Carbon::now();
 
         // Fill with site info
