@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SiteRequest;
 use App\Http\Traits\ApiResponse;
 use App\Jobs\CheckSiteHealth;
 use App\Models\Site;
@@ -11,7 +12,6 @@ use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * Class SiteController
@@ -23,19 +23,15 @@ class SiteController extends Controller
     use ApiResponse;
 
     /**
-     * @param Request $request
+     * @param SiteRequest $request
      *
      * @return JsonResponse
      * @throws \Exception
      */
-    public function register(Request $request): JsonResponse
+    public function register(SiteRequest $request): JsonResponse
     {
         $url = $request->string('url');
         $key = $request->string('key');
-
-        if ($url->isEmpty() || $key->isEmpty()) {
-            return $this->error('BadRequest');
-        }
 
         $connectionService = new Connection($url, $key);
 
@@ -66,18 +62,14 @@ class SiteController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param SiteRequest $request
      *
      * @return JsonResponse
      */
-    public function check(Request $request): JsonResponse
+    public function check(SiteRequest $request): JsonResponse
     {
         $url = $request->string('url');
         $key = $request->string('key');
-
-        if ($url->isEmpty() || $key->isEmpty()) {
-            return $this->error('BadRequest');
-        }
 
         $connectionService = new Connection($url, $key);
 
@@ -94,18 +86,14 @@ class SiteController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param SiteRequest $request
      *
      * @return JsonResponse
      */
-    public function delete(Request $request): JsonResponse
+    public function delete(SiteRequest $request): JsonResponse
     {
         $url = $request->string('url');
         $key = $request->string('key');
-
-        if ($url->isEmpty() || $key->isEmpty()) {
-            return $this->error('BadRequest');
-        }
 
         try {
             Site::where('url', $url)->where('key', $key)->delete();
