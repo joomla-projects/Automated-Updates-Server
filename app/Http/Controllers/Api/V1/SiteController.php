@@ -48,8 +48,8 @@ class SiteController extends Controller
             return $this->error($e->getMessage(), 500);
         }
 
-        // If successful save site
-        $site = new Site();
+        // If successful create or update site
+        $site = Site::where('url', $url)->where('key', $key)->first() ?? new Site();
 
         $site->key = $key;
         $site->url = $url;
@@ -77,14 +77,14 @@ class SiteController extends Controller
 
         try {
             /** @var Site $site */
-            $site = Site::where('url', $url)->where('key', $key)->findOrFail();
+            $site = Site::where('url', $url)->where('key', $key)->firstOrFail();
         } catch (\Exception $e) {
             return $this->error("Not found", 404);
         }
 
         // Do a health check
         try {
-            $site->getConnection()->checkHealth();
+            $site->connection->checkHealth();
         } catch (ServerException|ClientException $e) {
             return $this->error($e->getMessage(), 400);
         } catch (\Exception $e) {
@@ -105,7 +105,7 @@ class SiteController extends Controller
         $key = $request->string('key');
 
         try {
-            $site = Site::where('url', $url)->where('key', $key)->findOrFail();
+            $site = Site::where('url', $url)->where('key', $key)->firstOrFail();
         } catch (\Exception $e) {
             return $this->error("Not found", 404);
         }

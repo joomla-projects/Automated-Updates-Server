@@ -63,6 +63,7 @@ class UpdateSite implements ShouldQueue
         }
 
         $prepareResult = $connection->prepareUpdate(["targetVersion" => $this->targetVersion]);
+
         // Perform the actual extraction
         $this->performExtraction($prepareResult);
 

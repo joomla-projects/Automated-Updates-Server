@@ -6,15 +6,13 @@ use App\TUF\TufFetcher;
 
 trait RequestTargetVersion
 {
-    protected function getVersionChoices()
+    protected function queryTargetVersion(): string
     {
         $releases = (new TufFetcher())->getReleases();
 
-        $targetVersion = $this->choice(
+        return $this->choice( // @phpstan-ignore-line
             "What's the target version?",
-            $releases->map(fn ($release) => $release["version"])->values()->toArray()
+            $releases->map(fn ($release) => $release["version"])->values()->toArray() // @phpstan-ignore-line
         );
-
-        return $targetVersion;
     }
 }

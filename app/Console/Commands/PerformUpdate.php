@@ -28,9 +28,9 @@ class PerformUpdate extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
-        $targetVersion = $this->getVersionChoices();
+        $targetVersion = $this->queryTargetVersion();
 
         /** @var Site $site */
         $site = Site::findOrFail($this->input->getArgument('siteId'));

@@ -20,7 +20,7 @@ use Psr\Http\Message\RequestInterface;
 /**
  * @method  HealthCheckResponse checkHealth()
  * @method  GetUpdateResponse getUpdate()
- * @method  PrepareUpdateResponse prepareUpdate(string $targetVersion)
+ * @method  PrepareUpdateResponse prepareUpdate(array<string,string> $data)
  * @method  FinalizeUpdateResponse finalizeUpdate()
  */
 class Connection

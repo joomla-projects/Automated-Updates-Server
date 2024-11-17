@@ -30,9 +30,9 @@ class QueueUpdates extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
-        $targetVersion = $this->getVersionChoices();
+        $targetVersion = $this->queryTargetVersion();
 
         $this->confirm("Are you sure you would like to push the updates for " . $targetVersion);
 
