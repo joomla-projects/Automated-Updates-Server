@@ -48,7 +48,7 @@ class SiteController extends Controller
         $site = new Site();
 
         $site->key = $key;
-        $site->url = $url;
+        $site->url = rtrim($url, "/");
         $site->last_seen = Carbon::now();
 
         // Fill with site info

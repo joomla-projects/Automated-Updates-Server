@@ -75,7 +75,7 @@ class Connection
     protected function performWebserviceRequest(
         HttpMethod $method,
         string $endpoint,
-        array $requestData = []
+        ?array $requestData = null
     ): array {
         $request = new Request(
             $method->name,
@@ -89,7 +89,11 @@ class Connection
         $response = $this->performHttpRequest(
             $request,
             [
-                "json" => $requestData
+                "json" => $requestData,
+                "headers" => [
+                    "Content-Type" => "application/json",
+                    "Accept" => "application/vnd.api+json"
+                ]
             ]
         );
 
