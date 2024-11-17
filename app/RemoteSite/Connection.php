@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\RemoteSite;
 
 use App\Enum\HttpMethod;
-use App\Enum\WebserviceEndpoint;
 use App\RemoteSite\Responses\FinalizeUpdate as FinalizeUpdateResponse;
-use App\RemoteSite\Responses\HealthCheck as HealthCheckResponse;
 use App\RemoteSite\Responses\GetUpdate as GetUpdateResponse;
+use App\RemoteSite\Responses\HealthCheck as HealthCheckResponse;
 use App\RemoteSite\Responses\PrepareUpdate as PrepareUpdateResponse;
 use App\RemoteSite\Responses\ResponseInterface;
 use GuzzleHttp\Client;
