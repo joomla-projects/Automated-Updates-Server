@@ -34,15 +34,18 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        $connectionService = App::makeWith(Connection::class, ["baseUrl" => $url, "key" => $key]);
+        $connectionService = App::makeWith(
+            Connection::class,
+            ["baseUrl" => $url, "key" => $key]
+        );
 
         // Do a health check
         try {
             $healthResponse = $connectionService->checkHealth();
-        } catch (ServerException $e) {
+        } catch (ServerException|ClientException $e) {
+            return $this->error($e->getMessage(), 400);
+        } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
-        } catch (ClientException|\Exception $e) {
-            return $this->error($e->getMessage());
         }
 
         // If successful save site
