@@ -14,7 +14,7 @@ use Tuf\Metadata\StorageInterface;
 
 class TUFServiceProvider extends ServiceProvider
 {
-    const REPO_PATH = "https://update.joomla.org/cms/";
+    public const REPO_PATH = "https://update.joomla.org/cms/";
 
     /**
      * Register services.
