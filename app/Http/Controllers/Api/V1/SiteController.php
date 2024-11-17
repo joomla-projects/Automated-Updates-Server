@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SiteRequest;
+use App\Http\Traits\ApiResponse;
 use App\Jobs\CheckSiteHealth;
 use App\Models\Site;
 use App\RemoteSite\Connection;
-use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * Class SiteController
