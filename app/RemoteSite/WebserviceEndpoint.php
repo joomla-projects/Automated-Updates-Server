@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Enum;
+namespace App\RemoteSite;
 
+use App\Enum\HttpMethod;
 use App\RemoteSite\Responses\FinalizeUpdate;
 use App\RemoteSite\Responses\GetUpdate;
 use App\RemoteSite\Responses\HealthCheck;
