@@ -67,12 +67,10 @@ class Connection
             ]
         );
 
-        $responseData = $this->decodeResponse($response, $request);
-
-        return $responseData;
+        return $this->decodeResponse($response, $request);
     }
 
-    protected function performWebserviceRequest(
+    public function performWebserviceRequest(
         HttpMethod $method,
         string $endpoint,
         ?array $requestData = null

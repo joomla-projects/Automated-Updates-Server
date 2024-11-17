@@ -7,6 +7,6 @@ Route::prefix('v1')->group(function () {
     Route::controller(SiteController::class)->group(function () {
         Route::post('register', 'register');
         Route::post('check', 'check');
-        Route::delete('delete', 'delete');
+        Route::post('delete', 'delete');
     });
 });

@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SiteRequest;
-use App\Http\Traits\ApiResponse;
 use App\Jobs\CheckSiteHealth;
 use App\Models\Site;
 use App\RemoteSite\Connection;
+use App\Http\Traits\ApiResponse;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class SiteController
@@ -33,15 +34,18 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        $connectionService = new Connection($url, $key);
+        $connectionService = App::makeWith(
+            Connection::class,
+            ["baseUrl" => $url, "key" => $key]
+        );
 
         // Do a health check
         try {
             $healthResponse = $connectionService->checkHealth();
-        } catch (ServerException $e) {
+        } catch (ServerException|ClientException $e) {
+            return $this->error($e->getMessage(), 400);
+        } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
-        } catch (ClientException|\Exception $e) {
-            return $this->error($e->getMessage());
         }
 
         // If successful save site
