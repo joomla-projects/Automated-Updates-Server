@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Models\TufMetadata;
-use App\TUF\DatabaseStorage;
+use App\TUF\EloquentModelStorage;
 use App\TUF\HttpLoader;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\App;
@@ -33,7 +33,7 @@ class TUFServiceProvider extends ServiceProvider
             $sizeCheckingLoader = new SizeCheckingLoader($httpLoader);
 
             // Setup storage
-            $storage = new DatabaseStorage(TufMetadata::findOrFail(1));
+            $storage = new EloquentModelStorage(TufMetadata::findOrFail(1));
 
             // Create updater
             $updater = new Updater(
