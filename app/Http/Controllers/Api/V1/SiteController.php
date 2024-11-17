@@ -36,7 +36,7 @@ class SiteController extends Controller
 
         $connectionService = App::makeWith(
             Connection::class,
-            ["baseUrl" => $url, "key" => $key]
+            ["baseUrl" => rtrim($url, "/"), "key" => $key]
         );
 
         // Do a health check
@@ -48,11 +48,11 @@ class SiteController extends Controller
             return $this->error($e->getMessage(), 500);
         }
 
-        // If successful save site
-        $site = new Site();
+        // If successful create or update site
+        $site = Site::where('url', $url)->where('key', $key)->first() ?? new Site();
 
         $site->key = $key;
-        $site->url = rtrim($url, "/");
+        $site->url = $url;
         $site->last_seen = Carbon::now();
 
         // Fill with site info
@@ -75,15 +75,20 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        $connectionService = new Connection($url, $key);
+        try {
+            /** @var Site $site */
+            $site = Site::where('url', $url)->where('key', $key)->firstOrFail();
+        } catch (\Exception $e) {
+            return $this->error("Not found", 404);
+        }
 
         // Do a health check
         try {
-            $connectionService->checkHealth();
-        } catch (ServerException $e) {
+            $site->connection->checkHealth();
+        } catch (ServerException|ClientException $e) {
+            return $this->error($e->getMessage(), 400);
+        } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
-        } catch (ClientException|\Exception $e) {
-            return $this->error($e->getMessage());
         }
 
         return $this->ok();
@@ -100,10 +105,12 @@ class SiteController extends Controller
         $key = $request->string('key');
 
         try {
-            Site::where('url', $url)->where('key', $key)->delete();
+            $site = Site::where('url', $url)->where('key', $key)->firstOrFail();
         } catch (\Exception $e) {
-            return $this->error($e->getMessage());
+            return $this->error("Not found", 404);
         }
+
+        $site->delete();
 
         return $this->ok();
     }
