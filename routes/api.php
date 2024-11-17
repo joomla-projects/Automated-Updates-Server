@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::controller(SiteController::class)->group(function () {
-        Route::get('register', 'register');
-        Route::get('check', 'check');
+        Route::post('register', 'register');
+        Route::post('check', 'check');
         Route::delete('delete', 'delete');
     });
 });
