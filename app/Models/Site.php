@@ -47,7 +47,7 @@ class Site extends Model
     {
         return App::makeWith(
             Connection::class,
-            ["baseUrl" =>$this->url, "key" => $this->key]
+            ["baseUrl" => $this->url, "key" => $this->key]
         );
     }
 
