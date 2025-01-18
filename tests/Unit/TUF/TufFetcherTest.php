@@ -3,6 +3,7 @@
 namespace Tests\Unit\TUF;
 
 use App\TUF\EloquentModelStorage;
+use App\TUF\ReleaseData;
 use App\TUF\TufFetcher;
 use Illuminate\Support\Facades\App;
 use Tests\TestCase;
@@ -24,13 +25,15 @@ class TufFetcherTest extends TestCase
             "Joomla_5.1.2-Stable-Upgrade_Package.zip" => [
                 "custom" => [
                     "description" => "Joomla! 5.1.2 Release",
-                    "version" => "5.1.2"
+                    "version" => "5.1.2",
+                    "stability" => "stable",
                 ]
             ],
             "Joomla_5.2.1-Stable-Upgrade_Package.zip" => [
                 "custom" => [
                     "description" => "Joomla! 5.2.1 Release",
-                    "version" => "5.2.1"
+                    "version" => "5.2.1",
+                    "stability" => "stable",
                 ]
             ]
         ]));
@@ -39,14 +42,16 @@ class TufFetcherTest extends TestCase
         $result = $object->getReleases();
 
         $this->assertEquals([
-            "5.1.2" => [
+            "5.1.2" => ReleaseData::from([
                 "description" => "Joomla! 5.1.2 Release",
-                "version" => "5.1.2"
-            ],
-            "5.2.1" => [
+                "version" => "5.1.2",
+                "stability" => "stable",
+            ]),
+            "5.2.1" => ReleaseData::from([
                 "description" => "Joomla! 5.2.1 Release",
-                "version" => "5.2.1"
-            ],
+                "version" => "5.2.1",
+                "stability" => "stable",
+            ]),
         ], $result->toArray());
     }
 

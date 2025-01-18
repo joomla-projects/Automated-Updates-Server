@@ -41,7 +41,9 @@ class TufFetcher
                             throw new MetadataException("Empty target custom attribute");
                         }
 
-                        return [$target['custom']['version'] => $target['custom']];
+                        $release = ReleaseData::from($target['custom']);
+
+                        return [$release->version => $release];
                     });
             }
         );
@@ -49,10 +51,10 @@ class TufFetcher
 
     public function getLatestVersionForBranch(int $branch): string
     {
-        return $this->getReleases()->filter(function ($release) {
-            return $release["stability"] === "Stable";
-        })->sort(function ($releaseA, $releaseB) {
-            return version_compare($releaseA["version"], $releaseB["version"], '<');
+        return $this->getReleases()->filter(function (ReleaseData $release) {
+            return $release->stability === "Stable";
+        })->sort(function (ReleaseData $releaseA, ReleaseData $releaseB) {
+            return version_compare($releaseA->version, $releaseB->version, '<');
         })->pluck('version')->first();
     }
 }
