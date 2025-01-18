@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Exceptions\UpdateException;
 use App\Models\Site;
+use App\Models\Update;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -65,16 +67,31 @@ class UpdateSite implements ShouldQueue
         $prepareResult = $connection->prepareUpdate(["targetVersion" => $this->targetVersion]);
 
         // Perform the actual extraction
-        $this->performExtraction($prepareResult);
+        try {
+            $this->performExtraction($prepareResult);
+        } catch (\Throwable $e) {
+            throw new UpdateException(
+                'extract',
+                $e->getMessage(),
+                (int) $e->getCode(),
+                $e instanceof \Exception ? $e : null
+            );
+        }
 
         // Run the postupdate steps
         if (!$connection->finalizeUpdate()->success) {
-            throw new \Exception("Update for site failed in postprocessing: " . $this->site->id);
+            throw new UpdateException(
+                "finalize",
+                "Update for site failed in postprocessing: " . $this->site->id
+            );
         }
 
         // Compare codes
         if ($this->site->getFrontendStatus() !== $this->preUpdateCode) {
-            throw new \Exception("Status code has changed after update for site: " . $this->site->id);
+            throw new UpdateException(
+                "afterUpdate",
+                "Status code has changed after update for site: " . $this->site->id
+            );
         }
     }
 
@@ -121,5 +138,25 @@ class UpdateSite implements ShouldQueue
                 "task" => "finalizeUpdate"
             ]
         );
+
+        // Done, log successful update!
+        $this->site->updates()->create([
+            'old_version' => $this->site->cms_version,
+            'new_version' => $this->targetVersion,
+            'result' => true
+        ]);
+    }
+
+    public function failed(\Exception $exception): void
+    {
+        // We log any issues during the update to the DB
+        $this->site->updates()->create([
+            'old_version' => $this->site->cms_version,
+            'new_version' => $this->targetVersion,
+            'result' => false,
+            'failed_step' => $exception instanceof UpdateException ? $exception->getStep() : null,
+            'failed_message' => $exception->getMessage(),
+            'failed_trace' => $exception->getTraceAsString()
+        ]);
     }
 }
