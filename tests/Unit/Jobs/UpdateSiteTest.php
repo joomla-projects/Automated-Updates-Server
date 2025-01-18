@@ -5,21 +5,18 @@ namespace Tests\Unit\Jobs;
 use App\Exceptions\UpdateException;
 use App\Jobs\UpdateSite;
 use App\Models\Site;
-use App\Models\Update;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\FinalizeUpdate;
 use App\RemoteSite\Responses\GetUpdate;
 use App\RemoteSite\Responses\HealthCheck;
 use App\RemoteSite\Responses\PrepareUpdate;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class UpdateSiteTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testJobQuitsIfTargetVersionIsEqualOrNewer()
     {
         $site = $this->getSiteMock(['checkHealth' => $this->getHealthCheckMock(["cms_version" => "1.0.0"])]);
@@ -105,25 +102,24 @@ class UpdateSiteTest extends TestCase
 
     public function testJobWritesFailLogOnFailing()
     {
-        $siteMock = $this->getMockBuilder(Site::class)
-            ->onlyMethods(['getConnectionAttribute', 'getFrontendStatus'])
-            ->getMock();
-
-        $siteMock->id = 1;
-        $siteMock->url = "http://example.org";
-        $siteMock->cms_version = "1.0.0";
+        $siteMock = $this->getSiteMock(
+            [
+                'checkHealth' => $this->getHealthCheckMock(),
+                'getUpdate' => $this->getGetUpdateMock("1.0.1"),
+                'prepareUpdate' => $this->getPrepareUpdateMock(),
+                'finalizeUpdate' => $this->getFinalizeUpdateMock(false)
+            ],
+            [
+                'result' => false,
+                'old_version' => '1.0.0',
+                'new_version' => '1.0.1',
+                'failed_message' => 'This is a test',
+                'failed_step' => 'finalize'
+            ]
+        );
 
         $object = new UpdateSite($siteMock, "1.0.1");
         $object->failed(new UpdateException("finalize", "This is a test"));
-
-        $failedUpdate = Update::first();
-
-        $this->assertEquals(false, $failedUpdate->result);
-        $this->assertEquals("1.0.0", $failedUpdate->old_version);
-        $this->assertEquals("1.0.1", $failedUpdate->new_version);
-        $this->assertEquals("finalize", $failedUpdate->failed_step);
-        $this->assertEquals("This is a test", $failedUpdate->failed_message);
-        $this->assertNotEmpty($failedUpdate->failed_trace);
     }
 
     public function testJobWritesSuccessLogForSuccessfulJobs()
@@ -134,6 +130,11 @@ class UpdateSiteTest extends TestCase
                 'getUpdate' => $this->getGetUpdateMock("1.0.1"),
                 'prepareUpdate' => $this->getPrepareUpdateMock(),
                 'finalizeUpdate' => $this->getFinalizeUpdateMock(true)
+            ],
+            [
+                'result' => true,
+                'old_version' => '1.0.0',
+                'new_version' => '1.0.1'
             ]
         );
 
@@ -141,15 +142,9 @@ class UpdateSiteTest extends TestCase
 
         $object = new UpdateSite($site, "1.0.1");
         $object->handle();
-
-        $updateRow = Update::first();
-
-        $this->assertEquals(true, $updateRow->result);
-        $this->assertEquals("1.0.0", $updateRow->old_version);
-        $this->assertEquals("1.0.1", $updateRow->new_version);
     }
 
-    protected function getSiteMock(array $responses)
+    protected function getSiteMock(array $responses, array $expectedLogRow = null)
     {
         $connectionMock = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
@@ -163,10 +158,29 @@ class UpdateSiteTest extends TestCase
                 }
             );
 
-        $siteMock = $this->getMockBuilder(Site::class)
-            ->onlyMethods(['getConnectionAttribute', 'getFrontendStatus'])
+        $updateMock = $this->getMockBuilder(HasMany::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['create'])
             ->getMock();
 
+        if ($expectedLogRow) {
+            $updateMock
+                ->expects($this->once())
+                ->method('create')
+                ->with(self::callback(function ($args) use ($expectedLogRow) {
+                    return $expectedLogRow['result'] === $args['result']
+                        && $expectedLogRow['old_version'] === $args['old_version']
+                        && $expectedLogRow['new_version'] === $args['new_version']
+                        && (empty($expectedLogRow['failed_step']) || $expectedLogRow['failed_step'] === $args['failed_step'])
+                        && (empty($expectedLogRow['failed_message']) || $expectedLogRow['failed_message'] === $args['failed_message']);
+                }));
+        }
+
+        $siteMock = $this->getMockBuilder(Site::class)
+            ->onlyMethods(['getConnectionAttribute', 'getFrontendStatus', 'updates'])
+            ->getMock();
+
+        $siteMock->method('updates')->willReturn($updateMock);
         $siteMock->method('getConnectionAttribute')->willReturn($connectionMock);
         $siteMock->method('getFrontendStatus')->willReturn(200);
         $siteMock->id = 1;
