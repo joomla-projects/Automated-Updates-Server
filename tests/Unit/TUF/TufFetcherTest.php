@@ -81,7 +81,7 @@ class TufFetcherTest extends TestCase
 
     public function testGetLatestVersionForBranchReturnsNullForMissingBranch()
     {
-        App::bind(StorageInterface::class, fn() => $this->getStorageMock([
+        App::bind(StorageInterface::class, fn () => $this->getStorageMock([
             "Joomla_5.2.1-Stable-Upgrade_Package.zip" => [
                 "custom" => [
                     "description" => "Joomla! 5.2.1 Release",
@@ -99,7 +99,7 @@ class TufFetcherTest extends TestCase
 
     public function testGetLatestVersionForBranchChecksBranch()
     {
-        App::bind(StorageInterface::class, fn() => $this->getStorageMock([
+        App::bind(StorageInterface::class, fn () => $this->getStorageMock([
             "Joomla_5.2.1-Stable-Upgrade_Package.zip" => [
                 "custom" => [
                     "description" => "Joomla! 5.2.1 Release",
@@ -124,7 +124,7 @@ class TufFetcherTest extends TestCase
 
     public function testGetLatestVersionForBranchChecksOrdering()
     {
-        App::bind(StorageInterface::class, fn() => $this->getStorageMock([
+        App::bind(StorageInterface::class, fn () => $this->getStorageMock([
             "Joomla_5.2.3-Stable-Upgrade_Package.zip" => [
                 "custom" => [
                     "description" => "Joomla! 5.2.3 Release",
