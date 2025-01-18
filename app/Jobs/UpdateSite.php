@@ -6,7 +6,6 @@ namespace App\Jobs;
 
 use App\Models\Site;
 use App\RemoteSite\Connection;
-use App\RemoteSite\Responses\HealthCheck;
 use App\RemoteSite\Responses\PrepareUpdate;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
