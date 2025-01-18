@@ -45,7 +45,10 @@ class Site extends Model
 
     public function getConnectionAttribute(): Connection
     {
-        return new Connection($this->url, $this->key);
+        return App::makeWith(
+            Connection::class,
+            ["baseUrl" =>$this->url, "key" => $this->key]
+        );
     }
 
     public function getFrontendStatus(): int
