@@ -79,6 +79,81 @@ class TufFetcherTest extends TestCase
         $object->getReleases();
     }
 
+    public function testGetLatestVersionForBranchReturnsNullForMissingBranch()
+    {
+        App::bind(StorageInterface::class, fn() => $this->getStorageMock([
+            "Joomla_5.2.1-Stable-Upgrade_Package.zip" => [
+                "custom" => [
+                    "description" => "Joomla! 5.2.1 Release",
+                    "version" => "5.2.1",
+                    "stability" => "stable",
+                ]
+            ]
+        ]));
+
+        $object = new TufFetcher();
+        $result = $object->getLatestVersionForBranch(6);
+
+        $this->assertNull($result);
+    }
+
+    public function testGetLatestVersionForBranchChecksBranch()
+    {
+        App::bind(StorageInterface::class, fn() => $this->getStorageMock([
+            "Joomla_5.2.1-Stable-Upgrade_Package.zip" => [
+                "custom" => [
+                    "description" => "Joomla! 5.2.1 Release",
+                    "version" => "5.2.1",
+                    "stability" => "stable",
+                ]
+            ],
+            "Joomla_4.2.1-Stable-Upgrade_Package.zip" => [
+                "custom" => [
+                    "description" => "Joomla! 4.2.1 Release",
+                    "version" => "4.1.2",
+                    "stability" => "stable",
+                ]
+            ]
+        ]));
+
+        $object = new TufFetcher();
+        $result = $object->getLatestVersionForBranch(4);
+
+        $this->assertEquals("4.1.2", $result);
+    }
+
+    public function testGetLatestVersionForBranchChecksOrdering()
+    {
+        App::bind(StorageInterface::class, fn() => $this->getStorageMock([
+            "Joomla_5.2.3-Stable-Upgrade_Package.zip" => [
+                "custom" => [
+                    "description" => "Joomla! 5.2.3 Release",
+                    "version" => "5.2.3",
+                    "stability" => "stable",
+                ]
+            ],
+            "Joomla_5.2.1-Stable-Upgrade_Package.zip" => [
+                "custom" => [
+                    "description" => "Joomla! 5.2.1 Release",
+                    "version" => "5.2.1",
+                    "stability" => "stable",
+                ]
+            ],
+            "Joomla_5.2.2-Stable-Upgrade_Package.zip" => [
+                "custom" => [
+                    "description" => "Joomla! 5.2.2 Release",
+                    "version" => "5.2.2",
+                    "stability" => "stable",
+                ]
+            ]
+        ]));
+
+        $object = new TufFetcher();
+        $result = $object->getLatestVersionForBranch(5);
+
+        $this->assertEquals("5.2.3", $result);
+    }
+
     protected function getStorageMock(array $targets)
     {
         $targetsMock = $this->getMockBuilder(TargetsMetadata::class)
