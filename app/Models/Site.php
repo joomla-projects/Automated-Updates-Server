@@ -7,6 +7,7 @@ namespace App\Models;
 use App\RemoteSite\Connection;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 
 class Site extends Model
@@ -54,5 +55,13 @@ class Site extends Model
         $httpClient = App::make(Client::class);
 
         return $httpClient->get($this->url)->getStatusCode();
+    }
+
+    /**
+     * @return HasMany<Update, $this>
+     */
+    public function updates(): HasMany
+    {
+        return $this->hasMany(Update::class, 'site_id', 'id');
     }
 }

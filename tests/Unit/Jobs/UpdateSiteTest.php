@@ -2,19 +2,24 @@
 
 namespace Tests\Unit\Jobs;
 
+use App\Exceptions\UpdateException;
 use App\Jobs\UpdateSite;
 use App\Models\Site;
+use App\Models\Update;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\FinalizeUpdate;
 use App\RemoteSite\Responses\GetUpdate;
 use App\RemoteSite\Responses\HealthCheck;
 use App\RemoteSite\Responses\PrepareUpdate;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class UpdateSiteTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testJobQuitsIfTargetVersionIsEqualOrNewer()
     {
         $site = $this->getSiteMock(['checkHealth' => $this->getHealthCheckMock(["cms_version" => "1.0.0"])]);
@@ -98,6 +103,52 @@ class UpdateSiteTest extends TestCase
         $object->handle();
     }
 
+    public function testJobWritesFailLogOnFailing()
+    {
+        $siteMock = $this->getMockBuilder(Site::class)
+            ->onlyMethods(['getConnectionAttribute', 'getFrontendStatus'])
+            ->getMock();
+
+        $siteMock->id = 1;
+        $siteMock->url = "http://example.org";
+        $siteMock->cms_version = "1.0.0";
+
+        $object = new UpdateSite($siteMock, "1.0.1");
+        $object->failed(new UpdateException("finalize", "This is a test"));
+
+        $failedUpdate = Update::first();
+
+        $this->assertEquals(false, $failedUpdate->result);
+        $this->assertEquals("1.0.0", $failedUpdate->old_version);
+        $this->assertEquals("1.0.1", $failedUpdate->new_version);
+        $this->assertEquals("finalize", $failedUpdate->failed_step);
+        $this->assertEquals("This is a test", $failedUpdate->failed_message);
+        $this->assertNotEmpty($failedUpdate->failed_trace);
+    }
+
+    public function testJobWritesSuccessLogForSuccessfulJobs()
+    {
+        $site = $this->getSiteMock(
+            [
+                'checkHealth' => $this->getHealthCheckMock(),
+                'getUpdate' => $this->getGetUpdateMock("1.0.1"),
+                'prepareUpdate' => $this->getPrepareUpdateMock(),
+                'finalizeUpdate' => $this->getFinalizeUpdateMock(true)
+            ]
+        );
+
+        App::bind(Connection::class, fn () => $this->getSuccessfulExtractionMock());
+
+        $object = new UpdateSite($site, "1.0.1");
+        $object->handle();
+
+        $updateRow = Update::first();
+
+        $this->assertEquals(true, $updateRow->result);
+        $this->assertEquals("1.0.0", $updateRow->old_version);
+        $this->assertEquals("1.0.1", $updateRow->new_version);
+    }
+
     protected function getSiteMock(array $responses)
     {
         $connectionMock = $this->getMockBuilder(Connection::class)
@@ -120,6 +171,7 @@ class UpdateSiteTest extends TestCase
         $siteMock->method('getFrontendStatus')->willReturn(200);
         $siteMock->id = 1;
         $siteMock->url = "http://example.org";
+        $siteMock->cms_version = "1.0.0";
 
         return $siteMock;
     }
