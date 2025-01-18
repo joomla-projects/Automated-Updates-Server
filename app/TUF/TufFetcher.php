@@ -18,12 +18,12 @@ class TufFetcher
     }
 
     /**
-     * @return Collection
+     * @return Collection<string, ReleaseData>
      */
     public function getReleases(): Collection
     {
         // Cache response to avoid to make constant calls on the fly
-        return Cache::remember(
+        $releases = Cache::remember(
             'cms_targets',
             (int) config('autoupdates.tuf_repo_cachetime') * 60, // @phpstan-ignore-line
             function () {
@@ -41,18 +41,32 @@ class TufFetcher
                             throw new MetadataException("Empty target custom attribute");
                         }
 
-                        return [$target['custom']['version'] => $target['custom']];
+                        $release = ReleaseData::from($target['custom']);
+
+                        return [$release->version => $release];
                     });
             }
         );
+
+        if (!$releases instanceof Collection) {
+            throw new MetadataException("Invalid release list");
+        }
+
+        return $releases;
     }
 
-    public function getLatestVersionForBranch(int $branch): string
+    public function getLatestVersionForBranch(int $branch): ?string
     {
-        return $this->getReleases()->filter(function ($release) {
-            return $release["stability"] === "Stable";
-        })->sort(function ($releaseA, $releaseB) {
-            return version_compare($releaseA["version"], $releaseB["version"], '<');
-        })->pluck('version')->first();
+        $versionMatch = $this->getReleases()->filter(function (ReleaseData $release) use ($branch): bool {
+            return $release->stability === "stable" && $release->version[0] === (string) $branch;
+        })->sort(function (ReleaseData $releaseA, ReleaseData $releaseB): int {
+            return version_compare($releaseA->version, $releaseB->version);
+        })->last();
+
+        if (!$versionMatch instanceof ReleaseData) {
+            return null;
+        }
+
+        return $versionMatch->version;
     }
 }

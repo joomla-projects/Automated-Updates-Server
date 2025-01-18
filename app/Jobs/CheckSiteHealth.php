@@ -47,6 +47,11 @@ class CheckSiteHealth implements ShouldQueue
         $tufFetcher = App::make(TufFetcher::class);
         $latestVersion = $tufFetcher->getLatestVersionForBranch((int) $this->site->cms_version[0]);
 
+        // No latest version for branch available, unsupported branch - return
+        if (!$latestVersion) {
+            return;
+        }
+
         // Available version is not newer, exit
         if (!version_compare($latestVersion, $this->site->cms_version, ">")) {
             return;
