@@ -1,7 +1,7 @@
 # Joomla Automated Updates Server
 This is the server for automated updates of Joomla CMS instances running on joomla.org
 
-# Deployment
+# Deployment and usage
 * Install docker and docker compose
 * Check out this repo
 * Start the webserver and DB services:  `docker-compose -f docker-compose.prod.yml up -d` 
