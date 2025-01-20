@@ -2,6 +2,7 @@
 
 namespace App\Console\Traits;
 
+use App\TUF\ReleaseData;
 use App\TUF\TufFetcher;
 
 trait RequestTargetVersion
@@ -12,7 +13,7 @@ trait RequestTargetVersion
 
         return $this->choice( // @phpstan-ignore-line
             "What's the target version?",
-            $releases->map(fn ($release) => $release["version"])->values()->toArray() // @phpstan-ignore-line
+            $releases->map(fn (ReleaseData $release) => $release->version)->values()->toArray()
         );
     }
 }
