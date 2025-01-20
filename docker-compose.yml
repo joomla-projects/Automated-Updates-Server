@@ -1,4 +1,3 @@
-version: '3.1'
 services:
     mysql:
         image: 'mariadb:11'
@@ -20,6 +19,9 @@ services:
     php:
         build:
             context: .
+            args:
+                UID: ${HOST_UID}
+                GID: ${HOST_GID}
         entrypoint: php artisan octane:frankenphp --workers=1 --max-requests=1
         ports:
             - '21001:8000'
