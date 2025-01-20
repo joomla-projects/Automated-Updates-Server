@@ -14,9 +14,11 @@ RUN install-php-extensions \
     redis
 
 RUN addgroup --gid $GID nonroot && adduser --uid $UID --gid $GID --disabled-password --gecos "" nonroot
-USER nonroot
+COPY . /app
 
-COPY  --chown=nonroot:nonroot . /app
+RUN chown nonroot:nonroot -Rf /app
+
+USER nonroot
 RUN composer install --no-dev
 
 ENTRYPOINT ["php", "artisan", "octane:frankenphp"]
