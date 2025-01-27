@@ -58,7 +58,7 @@ class UpdateSiteTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testJobQuitsIfAvailabelUpdateDoesNotMatchTargetVersion()
+    public function testJobQuitsIfAvailableUpdateDoesNotMatchTargetVersion()
     {
         $site = $this->getSiteMock(
             [
