@@ -53,10 +53,10 @@ class Connection
     {
         $request = new Request(
             'POST',
-            $this->baseUrl . '/extract.php'
+            $this->baseUrl . '/index.php?jautoupdate=1'
         );
 
-        $data['password'] = $this->key;
+        $requestData['password'] = $this->key;
 
         // Get result
         $response = $this->performHttpRequest(
