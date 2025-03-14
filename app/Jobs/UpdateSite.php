@@ -106,7 +106,7 @@ class UpdateSite implements ShouldQueue
         // Ping server
         $pingResult = $connection->performExtractionRequest(["task" => "ping"]);
 
-        if (empty($pingResult["message"]) || $pingResult["message"] === 'Invalid login') {
+        if (empty($pingResult["message"]) || $pingResult["message"] !== 'Invalid login') {
             throw new \Exception(
                 "Invalid ping response for site: " . $this->site->id
             );
