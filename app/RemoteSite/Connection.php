@@ -21,7 +21,7 @@ use Psr\Http\Message\RequestInterface;
  * @method  HealthCheckResponse checkHealth()
  * @method  GetUpdateResponse getUpdate()
  * @method  PrepareUpdateResponse prepareUpdate(array<string,string> $data)
- * @method  FinalizeUpdateResponse finalizeUpdate()
+ * @method  FinalizeUpdateResponse finalizeUpdate(array<string,string> $data)
  */
 class Connection
 {

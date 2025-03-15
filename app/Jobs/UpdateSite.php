@@ -79,7 +79,7 @@ class UpdateSite implements ShouldQueue
         }
 
         // Run the postupdate steps
-        if (!$connection->finalizeUpdate()->success) {
+        if (!$connection->finalizeUpdate(["fromVersion" => $healthResult->cms_version])->success) {
             throw new UpdateException(
                 "finalize",
                 "Update for site failed in postprocessing: " . $this->site->id
