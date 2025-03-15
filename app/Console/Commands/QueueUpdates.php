@@ -46,6 +46,7 @@ class QueueUpdates extends Command
             );
 
         // Query the amount of sites to be updated
+        // @phpstan-ignore-next-line
         $updateCount = (int) $this->ask('How many updates will be pushed? - Use 0 for "ALL"', "100");
 
         if ($updateCount > 0) {
