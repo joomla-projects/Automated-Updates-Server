@@ -54,17 +54,17 @@ class QueueUpdates extends Command
 
         // Chunk and push to queue
         $sites->chunkById(
-                100,
-                function (Collection $chunk) use ($targetVersion) {
-                    // Show progress
-                    $this->output->write('.');
+            100,
+            function (Collection $chunk) use ($targetVersion) {
+                // Show progress
+                $this->output->write('.');
 
-                    $this->totalPushed += $chunk->count();
+                $this->totalPushed += $chunk->count();
 
-                    // Push each site check to queue
-                    $chunk->each(fn ($site) => UpdateSite::dispatch($site, $targetVersion));
-                }
-            );
+                // Push each site check to queue
+                $chunk->each(fn ($site) => UpdateSite::dispatch($site, $targetVersion));
+            }
+        );
 
         // Result
         $this->output->writeln("");
