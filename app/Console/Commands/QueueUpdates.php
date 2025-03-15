@@ -38,13 +38,22 @@ class QueueUpdates extends Command
 
         $this->output->writeln('Pushing update jobs');
 
-        Site::query()
+        $sites = Site::query()
             ->where(
                 'cms_version',
                 'like',
                 $targetVersion[0] . '%'
-            )
-            ->chunkById(
+            );
+
+        // Query the amount of sites to be updated
+        $updateCount = $this->ask('How many updates will be pushed? - Use 0 for "ALL"', 100);
+
+        if ($updateCount > 0) {
+            $sites->limit($updateCount);
+        }
+
+        // Chunk and push to queue
+        $sites->chunkById(
                 100,
                 function (Collection $chunk) use ($targetVersion) {
                     // Show progress
