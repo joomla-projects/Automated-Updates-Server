@@ -245,7 +245,7 @@ class UpdateSiteTest extends TestCase
                 function ($data) {
                     switch ($data["task"]) {
                         case "ping":
-                            return ["message" => "Success"];
+                            return ["message" => "Invalid login"];
 
                         case "startExtract":
                             return ["done" => true];
