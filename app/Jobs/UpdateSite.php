@@ -6,7 +6,6 @@ namespace App\Jobs;
 
 use App\Exceptions\UpdateException;
 use App\Models\Site;
-use App\Models\Update;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,6 +30,14 @@ class UpdateSite implements ShouldQueue
      */
     public function handle(): void
     {
+        $updateCount = $this->site->getUpdateCount($this->targetVersion);
+
+        if ($updateCount >= config('autoupdates.max_update_tries')) {
+            Log::info("Update Loop detected for Site: " . $this->site->id . '; TargetVersion: ' . $this->targetVersion);
+
+            return;
+        }
+
         /** @var Connection $connection */
         $connection = $this->site->connection;
 
