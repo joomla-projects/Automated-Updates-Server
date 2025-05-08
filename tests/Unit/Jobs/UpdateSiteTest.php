@@ -76,7 +76,7 @@ class UpdateSiteTest extends TestCase
         $this->assertTrue(true);
     }
 
-public function testJobQuitsIfAvailableUpdateWouldBeAMajorUpdate()
+    public function testJobQuitsIfAvailableUpdateWouldBeAMajorUpdate()
     {
         $site = $this->getSiteMock(
             [
