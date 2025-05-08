@@ -58,6 +58,24 @@ class UpdateSiteTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testJobQuitsIfWeDetectALoopForAVersion()
+    {
+        $site = $this->getSiteMock([], null, 6);
+
+        Log::spy();
+
+        $object = new UpdateSite($site, "1.0.1");
+        $object->handle();
+
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->withArgs(function ($message) {
+                return str_contains($message, 'Update Loop detected for Site');
+            });
+
+        $this->assertTrue(true);
+    }
+
     public function testJobQuitsIfAvailableUpdateDoesNotMatchTargetVersion()
     {
         $site = $this->getSiteMock(
@@ -144,7 +162,7 @@ class UpdateSiteTest extends TestCase
         $object->handle();
     }
 
-    protected function getSiteMock(array $responses, array $expectedLogRow = null)
+    protected function getSiteMock(array $responses, array $expectedLogRow = null, int $updateCount = 0)
     {
         $connectionMock = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
@@ -183,6 +201,7 @@ class UpdateSiteTest extends TestCase
         $siteMock->method('updates')->willReturn($updateMock);
         $siteMock->method('getConnectionAttribute')->willReturn($connectionMock);
         $siteMock->method('getFrontendStatus')->willReturn(200);
+        $siteMock->method('getUpdateCount')->willReturn($updateCount);
         $siteMock->id = 1;
         $siteMock->url = "http://example.org";
         $siteMock->cms_version = "1.0.0";

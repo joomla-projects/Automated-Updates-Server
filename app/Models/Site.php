@@ -60,6 +60,11 @@ class Site extends Model
         return $httpClient->get($this->url)->getStatusCode();
     }
 
+    public function getUpdateCount(string $targetVersion): int
+    {
+        return $this->updates()->where('new_version', $targetVersion)->count();
+    }
+
     /**
      * @return HasMany<Update, $this>
      */
