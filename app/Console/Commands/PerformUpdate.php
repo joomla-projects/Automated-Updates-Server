@@ -6,7 +6,6 @@ use App\Jobs\UpdateSite;
 use App\Models\Site;
 use Illuminate\Console\Command;
 use App\Console\Traits\RequestTargetVersion;
-use Illuminate\Support\Facades\Log;
 
 class PerformUpdate extends Command
 {

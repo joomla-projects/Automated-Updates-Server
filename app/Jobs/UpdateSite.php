@@ -6,10 +6,8 @@ namespace App\Jobs;
 
 use App\Exceptions\UpdateException;
 use App\Models\Site;
-use App\Models\Update;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\App;
