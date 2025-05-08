@@ -217,7 +217,7 @@ public function testJobQuitsIfAvailableUpdateWouldBeAMajorUpdate()
         }
 
         $siteMock = $this->getMockBuilder(Site::class)
-            ->onlyMethods(['getConnectionAttribute', 'getFrontendStatus', 'updates'])
+            ->onlyMethods(['getConnectionAttribute', 'getFrontendStatus', 'getUpdateCount', 'updates'])
             ->getMock();
 
         $siteMock->method('updates')->willReturn($updateMock);
