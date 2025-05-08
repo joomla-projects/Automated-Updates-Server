@@ -6,6 +6,7 @@ use App\Jobs\UpdateSite;
 use App\Models\Site;
 use Illuminate\Console\Command;
 use App\Console\Traits\RequestTargetVersion;
+use Illuminate\Support\Facades\Log;
 
 class PerformUpdate extends Command
 {
@@ -34,6 +35,14 @@ class PerformUpdate extends Command
 
         /** @var Site $site */
         $site = Site::findOrFail($this->input->getArgument('siteId'));
+
+        $updateCount = $site->updates()->where('new_version', $targetVersion)->count();
+
+        if ($updateCount >= config('autoupdates.max_update_tries')) {
+            Log::info("Update Loop detected for Site: " . $site->id . '; TargetVersion: ' . $targetVersion);
+
+            return Command::SUCCESS;
+        }
 
         UpdateSite::dispatchSync(
             $site,
