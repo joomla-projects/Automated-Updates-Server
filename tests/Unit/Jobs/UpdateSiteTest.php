@@ -76,6 +76,28 @@ class UpdateSiteTest extends TestCase
         $this->assertTrue(true);
     }
 
+public function testJobQuitsIfAvailableUpdateWouldBeAMajorUpdate()
+    {
+        $site = $this->getSiteMock(
+            [
+                'checkHealth' => $this->getHealthCheckMock(),
+                'getUpdate' => $this->getGetUpdateMock("2.0.0")
+            ]
+        );
+
+        Log::spy();
+
+        $object = new UpdateSite($site, "2.0.0");
+        $object->handle();
+
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->withArgs(function ($message) {
+                return str_contains($message, 'No major update for Site');
+            });
+
+        $this->assertTrue(true);
+    }
     public function testJobQuitsIfAvailableUpdateDoesNotMatchTargetVersion()
     {
         $site = $this->getSiteMock(

@@ -53,6 +53,16 @@ class UpdateSite implements ShouldQueue
             return;
         }
 
+        // Do not make a major version update
+        $majorVersionCms = (int) $healthResult->cms_version;
+        $majorTargetVersion = (int) $this->targetVersion;
+
+        if ($majorVersionCms <> $majorTargetVersion) {
+            Log::info("No major update for Site: " . $this->site->id);
+
+            return;
+        }
+
         // Store pre-update response code
         $this->preUpdateCode = $this->site->getFrontendStatus();
 
