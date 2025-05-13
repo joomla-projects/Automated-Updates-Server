@@ -51,6 +51,8 @@ enum WebserviceEndpoint: string
             case self::notificationFailed->name:
                 return Notification::class;
         }
+
+        throw new \ValueError("No response defined");
     }
 
     public function getUrl(): string
