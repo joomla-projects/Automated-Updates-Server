@@ -9,6 +9,7 @@ use App\RemoteSite\Responses\FinalizeUpdate as FinalizeUpdateResponse;
 use App\RemoteSite\Responses\GetUpdate as GetUpdateResponse;
 use App\RemoteSite\Responses\HealthCheck as HealthCheckResponse;
 use App\RemoteSite\Responses\PrepareUpdate as PrepareUpdateResponse;
+use App\RemoteSite\Responses\Notification as NotificationResponse;
 use App\RemoteSite\Responses\ResponseInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -22,6 +23,8 @@ use Psr\Http\Message\RequestInterface;
  * @method  GetUpdateResponse getUpdate()
  * @method  PrepareUpdateResponse prepareUpdate(array<string,string> $data)
  * @method  FinalizeUpdateResponse finalizeUpdate(array<string,string> $data)
+ * @method  NotificationResponse notificationSuccess(array<string,string> $data)
+ * @method  NotificationResponse notificationFailed(array<string,string> $data)
  */
 class Connection
 {
