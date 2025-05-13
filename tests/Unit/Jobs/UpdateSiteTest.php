@@ -9,6 +9,7 @@ use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\FinalizeUpdate;
 use App\RemoteSite\Responses\GetUpdate;
 use App\RemoteSite\Responses\HealthCheck;
+use App\RemoteSite\Responses\Notification;
 use App\RemoteSite\Responses\PrepareUpdate;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
@@ -147,7 +148,8 @@ class UpdateSiteTest extends TestCase
                 'checkHealth' => $this->getHealthCheckMock(),
                 'getUpdate' => $this->getGetUpdateMock("1.0.1"),
                 'prepareUpdate' => $this->getPrepareUpdateMock(),
-                'finalizeUpdate' => $this->getFinalizeUpdateMock(false)
+                'finalizeUpdate' => $this->getFinalizeUpdateMock(false),
+                'notificationFailed' => $this->getNotificationMock(true)
             ],
             [
                 'result' => false,
@@ -169,7 +171,8 @@ class UpdateSiteTest extends TestCase
                 'checkHealth' => $this->getHealthCheckMock(),
                 'getUpdate' => $this->getGetUpdateMock("1.0.1"),
                 'prepareUpdate' => $this->getPrepareUpdateMock(),
-                'finalizeUpdate' => $this->getFinalizeUpdateMock(true)
+                'finalizeUpdate' => $this->getFinalizeUpdateMock(true),
+                'notificationSuccess' => $this->getNotificationMock(true)
             ],
             [
                 'result' => true,
@@ -257,6 +260,13 @@ class UpdateSiteTest extends TestCase
     protected function getFinalizeUpdateMock(bool $success)
     {
         return FinalizeUpdate::from([
+            "success" => $success
+        ]);
+    }
+
+    protected function getNotificationMock(bool $success)
+    {
+        return Notification::from([
             "success" => $success
         ]);
     }
