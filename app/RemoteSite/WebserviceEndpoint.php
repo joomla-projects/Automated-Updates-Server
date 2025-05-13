@@ -7,6 +7,7 @@ use App\RemoteSite\Responses\FinalizeUpdate;
 use App\RemoteSite\Responses\GetUpdate;
 use App\RemoteSite\Responses\HealthCheck;
 use App\RemoteSite\Responses\PrepareUpdate;
+use App\RemoteSite\Responses\Notification;
 
 enum WebserviceEndpoint: string
 {
@@ -14,6 +15,8 @@ enum WebserviceEndpoint: string
     case getUpdate = "/api/index.php/v1/joomlaupdate/getUpdate";
     case prepareUpdate = "/api/index.php/v1/joomlaupdate/prepareUpdate";
     case finalizeUpdate = "/api/index.php/v1/joomlaupdate/finalizeUpdate";
+    case notificationSuccess = "/api/index.php/v1/joomlaupdate/notificationSuccess";
+    case notificationFailed = "/api/index.php/v1/joomlaupdate/notificationFailed";
 
     public function getMethod(): HttpMethod
     {
@@ -25,6 +28,8 @@ enum WebserviceEndpoint: string
                 // no break
             case self::prepareUpdate->name:
             case self::finalizeUpdate->name:
+            case self::notificationSuccess->name:
+            case self::notificationFailed->name:
                 return HttpMethod::POST;
         }
 
@@ -42,6 +47,9 @@ enum WebserviceEndpoint: string
                 return PrepareUpdate::class;
             case self::finalizeUpdate->name:
                 return FinalizeUpdate::class;
+            case self::notificationSuccess->name:
+            case self::notificationFailed->name:
+                return Notification::class;
         }
     }
 
