@@ -110,6 +110,9 @@ class UpdateSite implements ShouldQueue
                 "Status code has changed after update for site: " . $this->site->id
             );
         }
+
+        // Notify users
+        $connection->notificationSuccess(["fromVersion" => $healthResult->cms_version]);
     }
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
@@ -166,6 +169,12 @@ class UpdateSite implements ShouldQueue
 
     public function failed(\Exception $exception): void
     {
+        /** @var Connection $connection */
+        $connection = $this->site->connection;
+
+        // Notify users
+        $connection->notificationFailed(["fromVersion" => $this->site->cms_version]);
+
         // We log any issues during the update to the DB
         $this->site->updates()->create([
             'old_version' => $this->site->cms_version,
