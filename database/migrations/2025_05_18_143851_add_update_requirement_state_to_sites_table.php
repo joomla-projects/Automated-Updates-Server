@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -12,10 +12,6 @@ return new class extends Migration {
     {
         Schema::table('sites', function (Blueprint $table) {
             $table->boolean('update_requirement_state')->default(false)->nullable(true);
-
-            $table->dropColumn('update_patch');
-            $table->dropColumn('update_minor');
-            $table->dropColumn('update_major');
         });
     }
 
@@ -26,10 +22,6 @@ return new class extends Migration {
     {
         Schema::table('sites', function (Blueprint $table) {
             $table->dropColumn('update_requirement_state');
-
-            $table->boolean('update_patch');
-            $table->boolean('update_minor');
-            $table->boolean('update_major');
         });
     }
 };
