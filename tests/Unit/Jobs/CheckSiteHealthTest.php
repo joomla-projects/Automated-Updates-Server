@@ -84,6 +84,7 @@ class CheckSiteHealthTest extends TestCase
         $siteMock->id = 1;
         $siteMock->url = "http://example.org";
         $siteMock->cms_version = "1.0.0";
+        $siteMock->update_requirement_state = true;
 
         return $siteMock;
     }
