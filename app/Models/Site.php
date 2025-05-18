@@ -20,9 +20,7 @@ class Site extends Model
         'db_version',
         'cms_version',
         'server_os',
-        'update_patch',
-        'update_minor',
-        'update_major'
+        'update_requirement_state'
     ];
 
     protected $hidden = [
@@ -33,9 +31,7 @@ class Site extends Model
     {
         return [
             'last_seen' => 'datetime',
-            'update_patch' => 'bool',
-            'update_minor' => 'bool',
-            'update_major' => 'bool'
+            'update_requirement_state' => 'bool',
         ];
     }
 

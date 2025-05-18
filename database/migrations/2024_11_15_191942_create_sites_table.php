@@ -19,9 +19,6 @@ return new class () extends Migration {
             $table->string('db_version');
             $table->string('cms_version')->index();
             $table->string('server_os');
-            $table->boolean('update_patch');
-            $table->boolean('update_minor');
-            $table->boolean('update_major');
             $table->dateTime('last_seen');
             $table->timestamps();
         });
