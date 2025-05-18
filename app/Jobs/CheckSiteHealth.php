@@ -43,7 +43,6 @@ class CheckSiteHealth implements ShouldQueue
         $this->site->save();
 
         // Check if conditions are met
-        // @phpstan-ignore-next-line
         if (!$this->site->update_requirement_state) {
             return;
         }

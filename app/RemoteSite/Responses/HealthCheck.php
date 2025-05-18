@@ -12,7 +12,7 @@ class HealthCheck extends BaseDTO implements ResponseInterface
         public string $db_version,
         public string $cms_version,
         public string $server_os,
-        public bool $update_requirement_state
+        public ?bool $update_requirement_state = null
     ) {
     }
 }
