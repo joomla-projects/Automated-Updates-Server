@@ -61,22 +61,16 @@ class UpdateSiteTest extends TestCase
 
     public function testJobQuitsIfRequirementsArentMet()
     {
+        $this->expectExceptionMessage("Site does not meet requirements");
+
         $site = $this->getSiteMock(
             [
                 'checkHealth' => $this->getHealthCheckMock(['update_requirement_state' => false])
             ]
         );
 
-        Log::spy();
-
         $object = new UpdateSite($site, "1.0.1");
         $object->handle();
-
-        Log::shouldHaveReceived('info')
-            ->once()
-            ->withArgs(function ($message) {
-                return str_contains($message, 'Site does not meet requirements, abort');
-            });
 
         $this->assertTrue(true);
     }
