@@ -51,12 +51,6 @@ class UpdateSite implements ShouldQueue
             return;
         }
 
-        if (!$healthResult->update_requirement_state) {
-            Log::info("Site does not meet requirements, abort");
-
-            return;
-        }
-
         // Do not make a major version update
         $majorVersionCms = (int) $healthResult->cms_version;
         $majorTargetVersion = (int) $this->targetVersion;
@@ -65,6 +59,14 @@ class UpdateSite implements ShouldQueue
             Log::info("No major update for Site: " . $this->site->id);
 
             return;
+        }
+
+        // Update is available, but let's check if the requirements are met
+        if (!$healthResult->update_requirement_state) {
+            throw new UpdateException(
+                'verify',
+                "Site does not meet requirements"
+            );
         }
 
         // Store pre-update response code
