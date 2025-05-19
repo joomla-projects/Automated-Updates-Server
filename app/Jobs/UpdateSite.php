@@ -8,6 +8,7 @@ use App\Exceptions\UpdateException;
 use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\App;
@@ -70,7 +71,11 @@ class UpdateSite implements ShouldQueue
         }
 
         // Store pre-update response code
-        $this->preUpdateCode = $this->site->getFrontendStatus();
+        try {
+            $this->preUpdateCode = $this->site->getFrontendStatus();
+        } catch (RequestException $e) {
+            // Catch request exceptions - they should not stop the process
+        }
 
         // Let site fetch available updates
         $updateResult = $connection->getUpdate();
