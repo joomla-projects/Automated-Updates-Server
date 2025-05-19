@@ -3,6 +3,7 @@
 namespace Tests\Unit\Jobs;
 
 use App\Exceptions\UpdateException;
+use App\Jobs\CheckSiteHealth;
 use App\Jobs\UpdateSite;
 use App\Models\Site;
 use App\RemoteSite\Connection;
@@ -14,6 +15,7 @@ use App\RemoteSite\Responses\PrepareUpdate;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class UpdateSiteTest extends TestCase
@@ -182,6 +184,8 @@ class UpdateSiteTest extends TestCase
 
     public function testJobWritesSuccessLogForSuccessfulJobs()
     {
+        Queue::fake();
+
         $site = $this->getSiteMock(
             [
                 'checkHealth' => $this->getHealthCheckMock(),
@@ -201,6 +205,8 @@ class UpdateSiteTest extends TestCase
 
         $object = new UpdateSite($site, "1.0.1");
         $object->handle();
+
+        Queue::assertPushed(CheckSiteHealth::class);
     }
 
     protected function getSiteMock(array $responses, array $expectedLogRow = null, int $updateCount = 0)
