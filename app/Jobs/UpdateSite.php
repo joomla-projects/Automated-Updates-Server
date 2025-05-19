@@ -8,6 +8,7 @@ use App\Exceptions\UpdateException;
 use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -96,6 +97,9 @@ class UpdateSite implements ShouldQueue
 
         $prepareResult = $connection->prepareUpdate(["targetVersion" => $this->targetVersion]);
 
+        // Perform additional preparation calls
+        $this->performExtraPreparations($prepareResult);
+
         // Perform the actual extraction
         try {
             $this->performExtraction($prepareResult);
@@ -129,6 +133,29 @@ class UpdateSite implements ShouldQueue
 
         // Trigger site health check to write the update version back to the db
         CheckSiteHealth::dispatch($this->site);
+    }
+
+    protected function performExtraPreparations(PrepareUpdate $prepareResult): void
+    {
+        if (!count($prepareResult->preparationUrls)) {
+            return;
+        }
+
+        /** @var Client $httpClient */
+        $httpClient = App::make(Client::class);
+
+        // Call each preparation URL
+        foreach ($prepareResult->preparationUrls as $url) {
+            $httpClient->get(
+                $url,
+                [
+                    'timeout' => 30.0,
+                    'allow_redirects' => [
+                        'max' => 100
+                    ]
+                ]
+            );
+        }
     }
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
