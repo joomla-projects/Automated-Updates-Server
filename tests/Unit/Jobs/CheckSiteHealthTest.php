@@ -84,6 +84,7 @@ class CheckSiteHealthTest extends TestCase
         $siteMock->id = 1;
         $siteMock->url = "http://example.org";
         $siteMock->cms_version = "1.0.0";
+        $siteMock->update_requirement_state = true;
 
         return $siteMock;
     }
@@ -95,7 +96,8 @@ class CheckSiteHealthTest extends TestCase
             "db_type" => "mysqli",
             "db_version" => "1.0.0",
             "cms_version" => "1.0.0",
-            "server_os" => "Joomla OS 1.0.0"
+            "server_os" => "Joomla OS 1.0.0",
+            "update_requirement_state" => true
         ];
 
         return HealthCheck::from([

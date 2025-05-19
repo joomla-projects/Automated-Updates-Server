@@ -39,6 +39,7 @@ class QueueUpdates extends Command
         $this->output->writeln('Pushing update jobs');
 
         $sites = Site::query()
+            ->where('update_requirement_state', '=', true)
             ->where(
                 'cms_version',
                 'like',

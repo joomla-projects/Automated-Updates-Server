@@ -59,6 +59,28 @@ class UpdateSiteTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testJobQuitsIfRequirementsArentMet()
+    {
+        $site = $this->getSiteMock(
+            [
+                'checkHealth' => $this->getHealthCheckMock(['update_requirement_state' => false])
+            ]
+        );
+
+        Log::spy();
+
+        $object = new UpdateSite($site, "1.0.1");
+        $object->handle();
+
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->withArgs(function ($message) {
+                return str_contains($message, 'Site does not meet requirements, abort');
+            });
+
+        $this->assertTrue(true);
+    }
+
     public function testJobQuitsIfWeDetectALoopForAVersion()
     {
         $site = $this->getSiteMock([], null, 6);
@@ -241,7 +263,8 @@ class UpdateSiteTest extends TestCase
             "db_type" => "mysqli",
             "db_version" => "1.0.0",
             "cms_version" => "1.0.0",
-            "server_os" => "Joomla OS 1.0.0"
+            "server_os" => "Joomla OS 1.0.0",
+            "update_requirement_state" => true
         ];
 
         return HealthCheck::from([

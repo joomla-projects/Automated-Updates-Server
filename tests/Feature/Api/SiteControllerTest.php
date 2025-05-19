@@ -37,7 +37,8 @@ class SiteControllerTest extends TestCase
             "db_type" => "mysqli",
             "db_version" => "1.0.0",
             "cms_version" => "1.0.0",
-            "server_os" => "Joomla OS 1.0.0"
+            "server_os" => "Joomla OS 1.0.0",
+            "update_requirement_state" => true
         ]));
 
         $this->app->bind(Connection::class, fn () => $mock);
@@ -170,7 +171,8 @@ class SiteControllerTest extends TestCase
             "db_version" => "1.0.0",
             "cms_version" => "1.0.0",
             "server_os" => "Joomla OS 1.0.0",
-            "last_seen" => Carbon::now()
+            "last_seen" => Carbon::now(),
+            "update_requirement_state" => true
         ]);
 
         $site->key = 'foobar123foobar123foobar123foobar123';

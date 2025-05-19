@@ -42,6 +42,11 @@ class CheckSiteHealth implements ShouldQueue
         $this->site->last_seen = Carbon::now();
         $this->site->save();
 
+        // Check if conditions are met
+        if (!$this->site->update_requirement_state) {
+            return;
+        }
+
         // Check if a newer Joomla version for that site is available
         /** @var TufFetcher $tufFetcher */
         $tufFetcher = App::make(TufFetcher::class);
