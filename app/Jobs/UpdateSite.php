@@ -121,6 +121,9 @@ class UpdateSite implements ShouldQueue
 
         // Notify users
         $connection->notificationSuccess(["fromVersion" => $healthResult->cms_version]);
+
+        // Trigger site health check to write the update version back to the db
+        CheckSiteHealth::dispatch($this->site);
     }
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
@@ -173,9 +176,6 @@ class UpdateSite implements ShouldQueue
             'new_version' => $this->targetVersion,
             'result' => true
         ]);
-
-        // Trigger site health check to write the update version back to the db
-        CheckSiteHealth::dispatch($this->site);
     }
 
     public function failed(\Exception $exception): void
