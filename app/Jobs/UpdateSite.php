@@ -75,6 +75,7 @@ class UpdateSite implements ShouldQueue
             $this->preUpdateCode = $this->site->getFrontendStatus();
         } catch (RequestException $e) {
             // Catch request exceptions - they should not stop the process
+            $this->preUpdateCode = $e->getResponse()->getStatusCode();
         }
 
         // Let site fetch available updates
@@ -117,7 +118,14 @@ class UpdateSite implements ShouldQueue
         }
 
         // Compare codes
-        if ($this->site->getFrontendStatus() !== $this->preUpdateCode) {
+        try {
+            $afterUpdateCode = $this->site->getFrontendStatus();
+        } catch (RequestException $e) {
+            // Again, do not fetch exceptions
+            $afterUpdateCode = $e->getResponse()->getStatusCode();
+        }
+
+        if ($afterUpdateCode !== $this->preUpdateCode) {
             throw new UpdateException(
                 "afterUpdate",
                 "Status code has changed after update for site: " . $this->site->id
