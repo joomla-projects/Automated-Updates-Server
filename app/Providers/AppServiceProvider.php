@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('site', function (Request $request) {
             return Limit::perMinute(10)->by(
-                parse_url($request->input('url'), PHP_URL_HOST)
+                parse_url((string) $request->input('url'), PHP_URL_HOST)
             );
         });
     }
