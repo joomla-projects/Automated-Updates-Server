@@ -31,7 +31,7 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
      */
     public function uniqueId(): string
     {
-        return $this->site->id;
+        return (string) $this->site->id;
     }
 
     /**

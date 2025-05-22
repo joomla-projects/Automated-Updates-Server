@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
                 $siteHost = parse_url($request->input('url'), PHP_URL_HOST);
             }
 
-            if ($siteHost !== 'default' && $dnsResult = dns_get_record($siteHost, DNS_A)) {
+            if ($siteHost !== 'default' && $dnsResult = dns_get_record((string) $siteHost, DNS_A)) {
                 $siteIp = $dnsResult[0]['ip'];
             }
 

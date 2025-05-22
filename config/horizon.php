@@ -180,9 +180,9 @@ return [
     */
 
     'defaults' => [
-        'supervisor-cron'  => [
+        'supervisor-default'  => [
             'connection' => 'redis',
-            'queue' => ['default', 'cron'],
+            'queue' => ['default'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
