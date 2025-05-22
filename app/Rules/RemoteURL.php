@@ -22,7 +22,7 @@ class RemoteURL implements ValidationRule
             return;
         }
 
-        $host = parse_url($value, PHP_URL_HOST);
+        $host = (string) parse_url($value, PHP_URL_HOST);
         $ips = App::make(DNSLookup::class)->getIPs($host);
 
         // Could not resolve given address
