@@ -18,6 +18,8 @@ class RemoteURL implements ValidationRule
     {
         if (!is_string($value)) {
             $fail("Invalid URL: URL must be a string.");
+
+            return;
         }
 
         $host = parse_url($value, PHP_URL_HOST);
