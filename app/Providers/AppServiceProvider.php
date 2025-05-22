@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
             $siteHost = 'default';
 
             if (is_string($request->input('url'))) {
-                $siteHost = parse_url($request->input('url'), PHP_URL_HOST);
+                $siteHost = (string) parse_url($request->input('url'), PHP_URL_HOST);
             }
 
             // Define a rate limit per target IP
