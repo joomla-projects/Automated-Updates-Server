@@ -94,7 +94,9 @@ class Connection
                 "headers" => [
                     "Content-Type" => "application/json",
                     "Accept" => "application/vnd.api+json"
-                ]
+                ],
+                'timeout' => 60.0,
+                'connect_timeout' => 5.0,
             ]
         );
 

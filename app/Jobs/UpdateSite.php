@@ -9,21 +9,31 @@ use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
-class UpdateSite implements ShouldQueue
+class UpdateSite implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
     protected ?int $preUpdateCode = null;
+    public int $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
      */
     public function __construct(protected readonly Site $site, protected string $targetVersion)
     {
+    }
+
+    /**
+     * Get the unique ID for the job.
+     */
+    public function uniqueId(): string
+    {
+        return (string) $this->site->id;
     }
 
     /**
