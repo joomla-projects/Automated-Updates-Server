@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Network\DNSLookup;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -24,20 +25,30 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('site', function (Request $request) {
             $siteHost = 'default';
-            $siteIp = 'default';
 
             if (is_string($request->input('url'))) {
                 $siteHost = parse_url($request->input('url'), PHP_URL_HOST);
             }
 
-            if ($siteHost !== 'default' && $dnsResult = dns_get_record((string) $siteHost, DNS_A)) {
-                $siteIp = $dnsResult[0]['ip'];
+            // Define a rate limit per target IP
+            $siteIpLimits = [];
+
+            if ($siteHost !== 'default') {
+                $siteIps = (new DNSLookup)->getIPs($siteHost);
+
+                foreach ($siteIps as $siteIp) {
+                    $siteIpLimits[] = Limit::perMinute(5)->by("siteip-" . $siteIp);
+                }
+            }
+
+            if (!count($siteIpLimits)) {
+                $siteIpLimits = [Limit::perMinute(5)->by("siteip-default")];
             }
 
             return [
                 Limit::perMinute(5)->by("sitehost-" . $siteHost),
-                Limit::perMinute(10)->by("siteip-" . $siteIp),
-                Limit::perMinute(50)->by("ip-" . $request->ip())
+                Limit::perMinute(50)->by("requestip-" . $request->ip()),
+                ...$siteIpLimits
             ];
         });
     }
