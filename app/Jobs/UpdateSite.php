@@ -146,7 +146,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         $connection->notificationSuccess(["fromVersion" => $healthResult->cms_version]);
 
         // Trigger site health check to write the update version back to the db
-        CheckSiteHealth::dispatch($this->site)
+        CheckSiteHealth::dispatch($this->site);
     }
 
     protected function performExtraction(PrepareUpdate $prepareResult): void
