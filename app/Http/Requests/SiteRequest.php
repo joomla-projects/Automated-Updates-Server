@@ -15,7 +15,7 @@ class SiteRequest extends FormRequest
                 'string',
                 'url',
                 'max:255',
-                new RemoteURL
+                new RemoteURL()
             ],
             'key' => 'required|string|min:32|max:64',
         ];
