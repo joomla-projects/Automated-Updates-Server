@@ -4,7 +4,7 @@ namespace App\Network;
 
 class DNSLookup
 {
-    public function getIPs($hostname): array
+    public function getIPs(string $hostname): array
     {
         // IP as host given
         $ips = filter_var($hostname, FILTER_VALIDATE_IP) ? [$hostname] : [];
