@@ -210,7 +210,7 @@ return [
 
     'environments' => [
         'production' => [
-            'supervisor-cron' => [
+            'supervisor-default' => [
                 'maxProcesses' => 250,
                 'balanceMaxShift' => 10,
                 'balanceCooldown' => 25,
@@ -223,7 +223,7 @@ return [
         ],
 
         'local' => [
-            'supervisor-cron' => [
+            'supervisor-default' => [
                 'maxProcesses' => 3,
             ],
             'supervisor-updates' => [
