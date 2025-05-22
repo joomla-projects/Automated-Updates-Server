@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
             $siteIpLimits = [];
 
             if ($siteHost !== 'default') {
-                $siteIps = (new DNSLookup)->getIPs($siteHost);
+                $siteIps = (new DNSLookup())->getIPs($siteHost);
 
                 foreach ($siteIps as $siteIp) {
                     $siteIpLimits[] = Limit::perMinute(5)->by("siteip-" . $siteIp);
