@@ -123,7 +123,7 @@ class SiteControllerTest extends TestCase
             ["url" => "https://www.joomlaf.org", "key" => "foobar123foobar123foobar123foobar123"]
         );
 
-        $response->assertStatus(404);
+        $response->assertStatus(422);
     }
 
     public function testDeleteASiteReturns404ForInvalidSite(): void
@@ -133,7 +133,7 @@ class SiteControllerTest extends TestCase
             ["url" => "https://www.joomlaf.org", "key" => "foobar123foobar123foobar123foobar123"]
         );
 
-        $response->assertStatus(404);
+        $response->assertStatus(422);
     }
 
     public function testDeleteASiteRemovesRow(): void
