@@ -63,7 +63,7 @@ class QueueUpdates extends Command
                 $this->totalPushed += $chunk->count();
 
                 // Push each site check to queue
-                $chunk->each(fn ($site) => UpdateSite::dispatch($site, $targetVersion));
+                $chunk->each(fn ($site) => UpdateSite::dispatch($site, $targetVersion)->onQueue('updates'));
             }
         );
 

@@ -48,7 +48,7 @@ class QueueHealthChecks extends Command
                     $this->totalPushed += $chunk->count();
 
                     // Push each site check to queue
-                    $chunk->each(fn ($site) => CheckSiteHealth::dispatch($site));
+                    $chunk->each(fn ($site) => CheckSiteHealth::dispatch($site)->onQueue('cron'));
                 }
             );
 

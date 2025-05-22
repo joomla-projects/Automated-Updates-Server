@@ -8,19 +8,30 @@ use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\TUF\TufFetcher;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\App;
 
-class CheckSiteHealth implements ShouldQueue
+class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
+
+    public int $uniqueFor = 120;
 
     /**
      * Create a new job instance.
      */
     public function __construct(protected readonly Site $site)
     {
+    }
+
+    /**
+     * Get the unique ID for the job.
+     */
+    public function uniqueId(): string
+    {
+        return $this->site->id;
     }
 
     /**
@@ -66,6 +77,6 @@ class CheckSiteHealth implements ShouldQueue
         UpdateSite::dispatch(
             $this->site,
             $latestVersion
-        );
+        )->onQueue('updates');
     }
 }

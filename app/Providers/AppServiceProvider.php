@@ -23,10 +23,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('site', function (Request $request) {
-            return Limit::perMinute(10)->by(
-                // @phpstan-ignore-next-line
-                parse_url((string) $request->input('url'), PHP_URL_HOST)
-            );
+            $siteHost = 'default';
+            $siteIp = 'default';
+
+            if (is_string($request->input('url'))) {
+                $siteHost = parse_url($request->input('url'), PHP_URL_HOST);
+            }
+
+            if ($siteHost !== 'default' && $dnsResult = dns_get_record($siteHost, DNS_A)) {
+                $siteIp = $dnsResult[0]['ip'];
+            }
+
+            return [
+                Limit::perMinute(5)->by("sitehost-" . $siteHost),
+                Limit::perMinute(10)->by("siteip-" . $siteIp),
+                Limit::perMinute(50)->by("ip-" . $request->ip())
+            ];
         });
     }
 }
