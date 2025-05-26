@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
@@ -203,6 +204,11 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
 
     public function failed(\Exception $exception): void
     {
+        // Failure caused by multiple jobs executed at the same time, ignore
+        if ($exception instanceof MaxAttemptsExceededException) {
+            return;
+        }
+
         /** @var Connection $connection */
         $connection = $this->site->connection;
 
