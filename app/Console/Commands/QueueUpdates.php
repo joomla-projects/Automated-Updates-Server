@@ -34,7 +34,9 @@ class QueueUpdates extends Command
     {
         $targetVersion = $this->queryTargetVersion();
 
-        $this->confirm("Are you sure you would like to push the updates for " . $targetVersion);
+        if (!$this->confirm("Are you sure you would like to push the updates for " . $targetVersion)) {
+            return Command::FAILURE;
+        }
 
         $this->output->writeln('Pushing update jobs');
 
