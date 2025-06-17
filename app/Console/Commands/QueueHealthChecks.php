@@ -34,7 +34,7 @@ class QueueHealthChecks extends Command
         $this->output->writeln('Pushing pending health checks');
 
         Site::query()
-            ->whereDate(
+            ->where(
                 'last_seen',
                 '<',
                 Carbon::now()->subHours((int) config('autoupdates.healthcheck_interval')) // @phpstan-ignore-line
