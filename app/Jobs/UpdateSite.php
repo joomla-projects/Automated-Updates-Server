@@ -144,7 +144,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         }
 
         // Notify users
-        $connection->notificationSuccess(["fromVersion" => $healthResult->cms_version]);
+        $connection->notificationSuccess(["fromVersion" => $healthResult->cms_version, "toVersion" => $this->targetVersion]);
 
         // Trigger site health check to write the update version back to the db
         CheckSiteHealth::dispatch($this->site);
@@ -213,7 +213,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         $connection = $this->site->connection;
 
         // Notify users
-        $connection->notificationFailed(["fromVersion" => $this->site->cms_version]);
+        $connection->notificationFailed(["fromVersion" => $this->site->cms_version, "toVersion" => $this->targetVersion]);
 
         // We log any issues during the update to the DB
         $this->site->updates()->create([
