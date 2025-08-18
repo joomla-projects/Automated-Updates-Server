@@ -10,6 +10,7 @@ use App\RemoteSite\Responses\HealthCheck;
 use App\TUF\TufFetcher;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class CheckSiteHealthTest extends TestCase
@@ -35,7 +36,8 @@ class CheckSiteHealthTest extends TestCase
         $object->handle();
     }
 
-    public function testCheckHealthTriggersUpdateJobIfNewerVersionIsAvailable()
+    #[DataProvider('updateNecessityProvider')]
+    public function testCheckHealthTriggersUpdateJobIfRequired($currentVersion, $doUpdate)
     {
         Queue::fake();
 
@@ -50,14 +52,28 @@ class CheckSiteHealthTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $tufMock->method('getLatestVersionForBranch')->willReturn("2.0.0");
+        $tufMock->method('getLatestVersionForBranch')->willReturn($currentVersion);
 
         App::bind(TufFetcher::class, fn () => $tufMock);
 
         $object = new CheckSiteHealth($siteMock);
         $object->handle();
 
-        Queue::assertPushed(UpdateSite::class);
+        if ($doUpdate) {
+            Queue::assertPushed(UpdateSite::class);
+        } else {
+            Queue::assertNotPushed(UpdateSite::class);
+        }
+    }
+
+    public static function updateNecessityProvider(): array
+    {
+        return [
+            ['0.9.1', false],
+            ['1.0.0', false],
+            ['1.0.1', true],
+            ['2.0.0', true]
+        ];
     }
 
     protected function getSiteMock($healthMock)
