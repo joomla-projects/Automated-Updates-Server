@@ -69,7 +69,7 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
         }
 
         // Available version is not newer, exit
-        if (version_compare($latestVersion, $this->site->cms_version, "<")) {
+        if (version_compare($latestVersion, $this->site->cms_version, "<=")) {
             return;
         }
 
