@@ -84,12 +84,12 @@ class SiteControllerTest extends TestCase
 
         $this->postJson(
             '/api/v1/register',
-            ["url" => "https://www.joomla.org", "key" => "abcdef"]
+            ["url" => "https://www.joomla.org", "key" => "abcdefabcdefabcdefabcdefabcdefabcdef"]
         );
 
         $rows = Site::where('url', 'https://www.joomla.org')->get();
         $this->assertEquals(1, $rows->count());
-        $this->assertEquals('abcdef', $rows->first()->key);
+        $this->assertEquals('abcdefabcdefabcdefabcdefabcdefabcdef', $rows->first()->key);
     }
 
     public function testRegisteringASiteFailsWhenHealthCheckFails(): void
