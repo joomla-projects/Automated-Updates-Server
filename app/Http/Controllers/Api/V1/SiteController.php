@@ -48,9 +48,11 @@ class SiteController extends Controller
             return $this->error($e->getMessage(), 500);
         }
 
-        // If successful create or update site
-        $site = Site::where('url', $url)->where('key', $key)->first() ?? new Site();
+        // Remove older duplicates of the site if registered
+        Site::query()->where('url', $url)->delete();
 
+        // Create new row
+        $site = new Site();
         $site->key = $key;
         $site->url = $url;
         $site->last_seen = Carbon::now();
