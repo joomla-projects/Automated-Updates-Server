@@ -146,6 +146,13 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         // Notify users
         $connection->notificationSuccess(["fromVersion" => $healthResult->cms_version, "toVersion" => $this->targetVersion]);
 
+        // Done, log successful update!
+        $this->site->updates()->create([
+            'old_version' => $this->site->cms_version,
+            'new_version' => $this->targetVersion,
+            'result' => true
+        ]);
+
         // Trigger site health check to write the update version back to the db
         CheckSiteHealth::dispatch($this->site);
     }
@@ -193,13 +200,6 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
                 "task" => "finalizeUpdate"
             ]
         );
-
-        // Done, log successful update!
-        $this->site->updates()->create([
-            'old_version' => $this->site->cms_version,
-            'new_version' => $this->targetVersion,
-            'result' => true
-        ]);
     }
 
     public function failed(\Exception $exception): void
@@ -212,17 +212,29 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         /** @var Connection $connection */
         $connection = $this->site->connection;
 
+        // Get base execption information
+        $failedStep = $exception instanceof UpdateException ? $exception->getStep() : null;
+        $failedMessage = $exception->getMessage();
+        $failedTrace = $exception->getTraceAsString();
+
         // Notify users
-        $connection->notificationFailed(["fromVersion" => $this->site->cms_version, "toVersion" => $this->targetVersion]);
+        try {
+            $connection->notificationFailed(["fromVersion" => $this->site->cms_version, "toVersion" => $this->targetVersion]);
+        } catch (\Throwable $e) {
+            // If the notification fails, we have to catch the exception and combine both errors into a combined result
+            $failedStep .= " + notificationFailed";
+            $failedMessage .= " + " . $e->getMessage();
+            $failedTrace .= " + " . $e->getTraceAsString();
+        }
 
         // We log any issues during the update to the DB
         $this->site->updates()->create([
             'old_version' => $this->site->cms_version,
             'new_version' => $this->targetVersion,
             'result' => false,
-            'failed_step' => $exception instanceof UpdateException ? $exception->getStep() : null,
-            'failed_message' => $exception->getMessage(),
-            'failed_trace' => $exception->getTraceAsString()
+            'failed_step' => $failedStep,
+            'failed_message' => $failedMessage,
+            'failed_trace' => $failedTrace
         ]);
     }
 }
