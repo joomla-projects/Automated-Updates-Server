@@ -58,6 +58,39 @@ class SiteControllerTest extends TestCase
         Queue::assertPushed(CheckSiteHealth::class);
     }
 
+    public function testRegisteringASiteTwiceCreatesOnlyOneRow(): void
+    {
+        Queue::fake();
+
+        $mock = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mock->method('__call')->willReturn(HealthCheck::from([
+            "php_version" => "1.0.0",
+            "db_type" => "mysqli",
+            "db_version" => "1.0.0",
+            "cms_version" => "1.0.0",
+            "server_os" => "Joomla OS 1.0.0",
+            "update_requirement_state" => true
+        ]));
+
+        $this->app->bind(Connection::class, fn () => $mock);
+
+        $this->postJson(
+            '/api/v1/register',
+            ["url" => "https://www.joomla.org", "key" => "foobar123foobar123foobar123foobar123"]
+        );
+
+        $this->postJson(
+            '/api/v1/register',
+            ["url" => "https://www.joomla.org", "key" => "foobar123foobar123foobar123foobar123"]
+        );
+
+        $count = Site::where('url', 'https://www.joomla.org')->count();
+        $this->assertEquals(1, $count);
+    }
+
     public function testRegisteringASiteFailsWhenHealthCheckFails(): void
     {
         $mock = $this->getMockBuilder(Connection::class)
