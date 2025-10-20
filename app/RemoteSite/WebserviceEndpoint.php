@@ -33,6 +33,7 @@ enum WebserviceEndpoint: string
                 return HttpMethod::POST;
         }
 
+        // @phpstan-ignore-next-line
         throw new \ValueError("No method defined");
     }
 
@@ -52,6 +53,7 @@ enum WebserviceEndpoint: string
                 return Notification::class;
         }
 
+        // @phpstan-ignore-next-line
         throw new \ValueError("No response defined");
     }
 
