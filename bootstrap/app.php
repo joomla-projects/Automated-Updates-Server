@@ -33,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::warning('HTTP Request Exception', [
                 'url' => (string) $e->getRequest()->getUri(),
                 'status' => $e->getResponse()->getStatusCode(),
-                'body' => $e->getResponse()->getBody(),
+                'body' => substr((string) $e->getResponse()->getBody(), 0, 250)
             ]);
         })->stop();
     })->create();
