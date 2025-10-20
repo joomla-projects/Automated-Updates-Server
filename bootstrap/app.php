@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -33,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Log::warning('HTTP Request Exception', [
                 'url' => (string) $e->getRequest()->getUri(),
                 'status' => $e->getResponse()->getStatusCode(),
-                'body' => $e->getResponse()->getBody(),
+                'body' => Str::of((string) $e->getResponse()->getBody())->substr(0, 250)
             ]);
         })->stop();
     })->create();
