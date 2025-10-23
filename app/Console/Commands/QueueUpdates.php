@@ -12,6 +12,8 @@ class QueueUpdates extends Command
 {
     use RequestTargetVersion;
     protected int $totalPushed = 0;
+    protected int $updateLimit;
+    protected string $targetVersion;
 
     /**
      * The name and signature of the console command.
@@ -32,40 +34,53 @@ class QueueUpdates extends Command
      */
     public function handle(): int
     {
-        $targetVersion = $this->queryTargetVersion();
+        $this->targetVersion = $this->queryTargetVersion();
 
-        if (!$this->confirm("Are you sure you would like to push the updates for " . $targetVersion)) {
+        if (!$this->confirm("Are you sure you would like to push the updates for " . $this->targetVersion)) {
             return Command::FAILURE;
         }
 
         $this->output->writeln('Pushing update jobs');
 
+        // Get update-ready sites in correct major branch that are not yet on the target version
         $sites = Site::query()
             ->where(
                 'cms_version',
                 'like',
-                $targetVersion[0] . '%'
+                $this->targetVersion[0] . '%'
+            )
+            ->where(
+                'update_requirement_state',
+                '=',
+                1
+            )
+            ->where(
+                'cms_version',
+                '!=',
+                $this->targetVersion
             );
 
         // Query the amount of sites to be updated
         // @phpstan-ignore-next-line
-        $updateCount = (int) $this->ask('How many updates will be pushed? - Use 0 for "ALL"', "100");
-
-        if ($updateCount > 0) {
-            $sites->limit($updateCount);
-        }
+        $this->updateLimit = (int) $this->ask('How many updates will be pushed? - Use 0 for "ALL"', "100");
 
         // Chunk and push to queue
         $sites->chunkById(
             100,
-            function (Collection $chunk) use ($targetVersion) {
+            function (Collection $chunk) {
                 // Show progress
                 $this->output->write('.');
 
-                $this->totalPushed += $chunk->count();
-
                 // Push each site check to queue
-                $chunk->each(fn ($site) => UpdateSite::dispatch($site, $targetVersion)->onQueue('updates'));
+                $chunk->each(function (Site $site) {
+                    if ($this->updateLimit > 0 && $this->totalPushed >= $this->updateLimit) {
+                        return;
+                    }
+
+                    $this->totalPushed++;
+
+                    UpdateSite::dispatch($site, $this->targetVersion)->onQueue('updates');
+                });
             }
         );
 
