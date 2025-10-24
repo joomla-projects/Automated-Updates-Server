@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Illuminate\Foundation\Application;
@@ -29,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->report(function (ServerException|ClientException $e) {
+        $exceptions->report(function (ServerException|ClientException|RequestException $e) {
             Log::warning('HTTP Request Exception', [
                 'url' => (string) $e->getRequest()->getUri(),
                 'status' => $e->getResponse()->getStatusCode(),
