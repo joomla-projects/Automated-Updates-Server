@@ -37,4 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'body' => substr((string) $e->getResponse()->getBody(), 0, 250)
             ]);
         })->stop();
+
+        // We have jobs that will run into max attempts, don't write them to log
+        $exceptions->dontReport(\Illuminate\Queue\MaxAttemptsExceededException::class);
     })->create();
