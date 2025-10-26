@@ -6,9 +6,9 @@ This is the server for automated updates of Joomla CMS instances running on joom
 * Check out this repo
 * Copy to .env.example to .env and adjust to your requirements - important: set UID and GID to user and group on the host system that you would like to use for the processes
 * Start the webserver and DB services:  `docker-compose -f docker-compose.prod.yml up -d` 
-* Apply the database migrations: `docker-compose run --entrypoint="php artisan migrate" php`
-* Daemonize the queue worker, i.e. by using supervisord; the call in question is: `docker-compose run --entrypoint="php artisan horizon" php`
-* Add a cron job to execute the task scheduler. The scheduler should be trigger every 5min, the call is: `docker-compose run --entrypoint="php artisan schedule:run" php`
+* Apply the database migrations: `docker-compose run --entrypoint="php artisan migrate" php-fpm`
+* Daemonize the queue worker, i.e. by using supervisord; the call in question is: `docker-compose run --entrypoint="php artisan horizon" php-fpm`
+* Add a cron job to execute the task scheduler. The scheduler should be trigger every 5min, the call is: `docker-compose run --entrypoint="php artisan schedule:run" php-fpm`
 
 ## Periodic operations
 The update server performs several operations automatically, if the the cron job is configured. Each operation is a artisan console job and can be manually performed if necessary.
@@ -21,7 +21,7 @@ The update server performs several operations automatically, if the the cron job
 
 ## Manual operations
 The update server has multiple manual operations available that can be triggered via CLI. In order to do so, execute the respective command in the PHP container of the docker setup:
-`docker-compose run --entrypoint="php artisan $COMMAND" php`
+`docker-compose run --entrypoint="php artisan $COMMAND" php-fpm`
 
 | Command                        | Description                                                                                                               |
 |--------------------------------|---------------------------------------------------------------------------------------------------------------------------|

@@ -7,24 +7,36 @@ services:
             - MYSQL_USER=joomla
             - MYSQL_PASSWORD=password
         ports:
-            - '21002:3306'
+            - '127.0.0.1:21002:3306'
         volumes:
             - joomla-autoupdates-mariadb:/var/lib/mysql
 
     redis:
       image: redis
       ports:
-       - "21003:6379"
+       - "127.0.0.1:21003:6379"
 
-    php:
+    webserver:
+        image: 'nginx:alpine'
+        working_dir: /application
+        volumes:
+            - './:/application'
+            - './docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf'
+        ports:
+            - '127.0.0.1:21001:80'
+
+    php-fpm:
         build:
-            context: .
+            context: docker/php-fpm
             args:
                 UID: ${HOST_UID}
                 GID: ${HOST_GID}
-        entrypoint: php artisan octane:frankenphp --workers=1 --max-requests=1
-        ports:
-            - '21001:8000'
+        working_dir: /application
+        volumes:
+            - './:/application'
+            - './docker/php-fpm/php-ini-overrides.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini'
+            - './docker/php-fpm/php-ini-overrides.ini:/etc/php/8.3/cli/conf.d/99-overrides.ini'
+            - './docker/php-fpm/www.conf:/etc/php/8.3/fpm/pool.d/www.conf'
 
 volumes:
   joomla-autoupdates-mariadb:
