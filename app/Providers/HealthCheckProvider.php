@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Spatie\CpuLoadHealthCheck\CpuLoadCheck;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
 use Spatie\Health\Checks\Checks\HorizonCheck;
+use Spatie\Health\Checks\Checks\RedisCheck;
 use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
 use Spatie\Health\Facades\Health;
 
@@ -26,7 +28,9 @@ class HealthCheckProvider extends ServiceProvider
         Health::checks([
             UsedDiskSpaceCheck::new(),
             DatabaseCheck::new(),
-            HorizonCheck::new()
+            HorizonCheck::new(),
+            RedisCheck::new(),
+            CpuLoadCheck::new()
         ]);
     }
 }
