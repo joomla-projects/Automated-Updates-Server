@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use Illuminate\Support\Facades\App;
 use Psr\Http\Message\RequestInterface;
 
@@ -121,11 +122,32 @@ class Connection
         /** @var Client $httpClient */
         $httpClient = App::make(Client::class);
 
+        // Send a streamed response to be able to validate the size
+        $options['stream'] = true;
+        $options['progress'] = function (
+            $downloadTotal,
+            $downloadedBytes
+        ) use ($request) {
+            if ($downloadedBytes > 1024000) {
+                throw new \RuntimeException("Unplausible response size while fetchting from " . $request->getUri());
+            }
+        };
+
         /** @var Response $response */
         $response = $httpClient->send(
             $request,
             $options
         );
+
+        // Convert the streamed response into a "normal" one
+        $buffer = '';
+
+        while (!$response->getBody()->eof()) {
+            $buffer .= $response->getBody()->read(8192);
+        }
+
+        // Overwrite streamed body
+        $response = $response->withBody(Utils::streamFor($buffer));
 
         // Validate response
         if (!json_validate((string) $response->getBody())) {
