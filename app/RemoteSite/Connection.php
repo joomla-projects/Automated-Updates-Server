@@ -129,7 +129,7 @@ class Connection
             $downloadedBytes
         ) use ($request) {
             if ($downloadedBytes > 1024000) {
-                throw new \RuntimeException("Unplausible response size while fetchting from " . $request->getUri());
+                throw new \RuntimeException("Unplausible response size while fetching from " . $request->getUri());
             }
         };
 
