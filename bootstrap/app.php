@@ -38,6 +38,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
         })->stop();
 
+        $exceptions->report(function (\GuzzleHttp\Exception\ConnectException $e) {
+            Log::warning('Connect Exception', [
+                'message' => $e->getMessage(),
+                'url' => (string) $e->getRequest()?->getUri()
+            ]);
+        })->stop();
+
         // We have jobs that will run into max attempts, don't write them to log
         $exceptions->dontReport(\Illuminate\Queue\MaxAttemptsExceededException::class);
     })->create();
