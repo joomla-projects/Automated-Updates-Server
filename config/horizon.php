@@ -216,7 +216,7 @@ return [
                 'balanceCooldown' => 3,
             ],
             'supervisor-updates' => [
-                'maxProcesses' => 60,
+                'maxProcesses' => 80,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
