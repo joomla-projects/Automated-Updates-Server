@@ -59,7 +59,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         } catch (\Throwable $e) {
             throw new UpdateException(
                 "checkHealth",
-                "Health check failed",
+                $e->getMessage(),
                 (int) $e->getCode(),
                 $e instanceof \Exception ? $e : null
             );
@@ -120,7 +120,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         } catch (\Throwable $e) {
             throw new UpdateException(
                 "prepareUpdate",
-                "Prepare failed",
+                $e->getMessage(),
                 (int) $e->getCode(),
                 $e instanceof \Exception ? $e : null
             );
