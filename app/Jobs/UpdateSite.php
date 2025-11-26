@@ -54,7 +54,16 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         $connection = $this->site->connection;
 
         // Test connection and get current version
-        $healthResult = $connection->checkHealth();
+        try {
+            $healthResult = $connection->checkHealth();
+        } catch (\Throwable $e) {
+            throw new UpdateException(
+                "checkHealth",
+                "Health check failed",
+                (int) $e->getCode(),
+                $e instanceof \Exception ? $e : null
+            );
+        }
 
         // Check the version
         if (version_compare($healthResult->cms_version, $this->targetVersion, ">=")) {
@@ -106,7 +115,16 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
             return;
         }
 
-        $prepareResult = $connection->prepareUpdate(["targetVersion" => $this->targetVersion]);
+        try {
+            $prepareResult = $connection->prepareUpdate(["targetVersion" => $this->targetVersion]);
+        } catch (\Throwable $e) {
+            throw new UpdateException(
+                "prepareUpdate",
+                "Prepare failed",
+                (int) $e->getCode(),
+                $e instanceof \Exception ? $e : null
+            );
+        }
 
         // Perform the actual extraction
         try {
@@ -213,9 +231,18 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         $connection = $this->site->connection;
 
         // Get base execption information
-        $failedStep = $exception instanceof UpdateException ? $exception->getStep() : null;
+        $failedStep = $exception instanceof UpdateException ? $exception->getStep() : get_class($exception);
         $failedMessage = $exception->getMessage();
         $failedTrace = $exception->getTraceAsString();
+
+        // Log response body
+        if ($exception instanceof RequestException) {
+            $failedMessage .= "\n Response Body: " . $exception->getResponse()->getBody();
+        }
+
+        if ($exception->getPrevious() instanceof RequestException) {
+            $failedMessage .= "\n Response Body: " . $exception->getPrevious()->getResponse()->getBody();
+        }
 
         // Notify users
         try {
