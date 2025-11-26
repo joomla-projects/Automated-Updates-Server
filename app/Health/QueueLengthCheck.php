@@ -5,6 +5,7 @@ namespace App\Health;
 use Laravel\Horizon\Contracts\JobRepository;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
+
 class QueueLengthCheck extends Check
 {
     public function run(): Result
