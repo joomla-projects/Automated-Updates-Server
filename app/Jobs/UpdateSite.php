@@ -237,11 +237,11 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
 
         // Log response body
         if ($exception instanceof RequestException) {
-            $failedMessage .= "\n Response Body: " . $exception->getResponse()->getBody();
+            $failedMessage .= "\n Response Body: " . $exception->getResponse()?->getBody();
         }
 
         if ($exception->getPrevious() instanceof RequestException) {
-            $failedMessage .= "\n Response Body: " . $exception->getPrevious()->getResponse()->getBody();
+            $failedMessage .= "\n Response Body: " . $exception->getPrevious()->getResponse()?->getBody();
         }
 
         // Notify users
