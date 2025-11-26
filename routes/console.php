@@ -8,3 +8,4 @@ use App\Console\Commands\CleanupSitesList;
 Schedule::command(CleanupSitesList::class)->everySixHours();
 Schedule::command(PruneFailedJobsCommand::class)->daily();
 Schedule::command(QueueHealthChecks::class)->everyFifteenMinutes();
+Schedule::command('horizon:snapshot')->everyFiveMinutes();
