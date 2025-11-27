@@ -157,7 +157,12 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         if ($afterUpdateCode !== $this->preUpdateCode) {
             throw new UpdateException(
                 "afterUpdate",
-                "Status code has changed after update for site: " . $this->site->id
+                sprintf(
+                    "Status code has changed from %s to %s after update for site: %s",
+                    $this->preUpdateCode,
+                    $afterUpdateCode,
+                    $this->site->id
+                )
             );
         }
 
