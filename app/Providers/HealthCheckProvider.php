@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Health\QueueLengthCheck;
 use Illuminate\Support\ServiceProvider;
 use Spatie\CpuLoadHealthCheck\CpuLoadCheck;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
@@ -29,6 +30,7 @@ class HealthCheckProvider extends ServiceProvider
             UsedDiskSpaceCheck::new(),
             DatabaseCheck::new(),
             HorizonCheck::new(),
+            QueueLengthCheck::new(),
             RedisCheck::new(),
             CpuLoadCheck::new()
         ]);
