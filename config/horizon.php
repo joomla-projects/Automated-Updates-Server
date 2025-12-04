@@ -211,12 +211,12 @@ return [
     'environments' => [
         'production' => [
             'supervisor-default' => [
-                'maxProcesses' => 15,
+                'maxProcesses' => 20,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
             'supervisor-updates' => [
-                'maxProcesses' => 40,
+                'maxProcesses' => 80,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
