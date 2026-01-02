@@ -17,6 +17,8 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
 
+    public int $tries = 1;
+
     public int $uniqueFor = 120;
 
     /**
