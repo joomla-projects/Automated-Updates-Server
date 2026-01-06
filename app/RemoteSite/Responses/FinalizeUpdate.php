@@ -18,7 +18,7 @@ class FinalizeUpdate extends BaseDTO implements ResponseInterface
             return false;
         }
 
-        $errorString = json_encode($this->errors);
+        $errorString = (string) json_encode($this->errors);
 
         if (str_contains($errorString, 'Undefined constant') && str_contains($errorString, 'T4PATH_MEDIA')) {
             return true;

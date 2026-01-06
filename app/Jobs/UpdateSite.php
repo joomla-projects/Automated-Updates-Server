@@ -8,7 +8,6 @@ use App\Exceptions\UpdateException;
 use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
-use App\Services\FinalizeErrorAssessor;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
