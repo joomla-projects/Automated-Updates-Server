@@ -7,7 +7,8 @@ use App\DTO\BaseDTO;
 class FinalizeUpdate extends BaseDTO implements ResponseInterface
 {
     public function __construct(
-        public bool $success
+        public bool $success,
+        public ?array $errors = null,
     ) {
     }
 }
