@@ -142,7 +142,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         // Run the postupdate steps
         $postUpdateResult = $connection->finalizeUpdate(["fromVersion" => $healthResult->cms_version]);
 
-        if (!$postUpdateResult->success) {
+        if (!$postUpdateResult->success && !$postUpdateResult->hasIgnorableError()) {
             throw new UpdateException(
                 "finalize",
                 "Update for site failed in postprocessing: " . $this->site->id . ", errors: " . json_encode($postUpdateResult->errors),
