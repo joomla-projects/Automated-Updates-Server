@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Console\Traits\RequestTargetVersion;
 use App\Jobs\UpdateSite;
 use App\Models\Site;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -42,22 +43,31 @@ class QueueUpdates extends Command
 
         $this->output->writeln('Pushing update jobs');
 
-        // Get update-ready sites in correct major branch that are not yet on the target version
+        // Get update-ready sites... that are not yet on the target version
         $sites = Site::query()
+            // ... in correct major version branch
             ->where(
                 'cms_version',
                 'like',
                 $this->targetVersion[0] . '%'
             )
+            // ... that are not yet on the target version
+            ->where(
+                'cms_version',
+                '!=',
+                $this->targetVersion
+            )
+            // ... that match the update requirements
             ->where(
                 'update_requirement_state',
                 '=',
                 1
             )
+            // ... that have been seen in the last two health check cycles
             ->where(
-                'cms_version',
-                '!=',
-                $this->targetVersion
+                'last_seen',
+                '>',
+                Carbon::now()->subHours((int) config('autoupdates.healthcheck_interval') * 2) // @phpstan-ignore-line
             );
 
         // Query the amount of sites to be updated
