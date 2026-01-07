@@ -23,7 +23,7 @@ use Psr\Http\Message\RequestInterface;
  * @method  HealthCheckResponse checkHealth()
  * @method  GetUpdateResponse getUpdate()
  * @method  PrepareUpdateResponse prepareUpdate(array<string,string> $data)
- * @method  FinalizeUpdateResponse finalizeUpdate(array<string,string> $data)
+ * @method  FinalizeUpdateResponse finalizeUpdate(array<string,string|null> $data)
  * @method  NotificationResponse notificationSuccess(array<string,string> $data)
  * @method  NotificationResponse notificationFailed(array<string,string> $data)
  */
