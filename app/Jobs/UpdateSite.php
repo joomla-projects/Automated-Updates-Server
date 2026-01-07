@@ -140,7 +140,10 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         }
 
         // Run the postupdate steps
-        $postUpdateResult = $connection->finalizeUpdate(["fromVersion" => $healthResult->cms_version]);
+        $postUpdateResult = $connection->finalizeUpdate([
+            "fromVersion" => $healthResult->cms_version,
+            "updateFileName" => $prepareResult->filename,
+        ]);
 
         if (!$postUpdateResult->success && !$postUpdateResult->hasIgnorableError()) {
             throw new UpdateException(
