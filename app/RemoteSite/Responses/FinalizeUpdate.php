@@ -24,7 +24,7 @@ class FinalizeUpdate extends BaseDTO implements ResponseInterface
             return true;
         }
 
-        if (str_contains($errorString, 'Error on updating manifest cache') && str_contains($errorString, 'T4PATH_MEDIA')) {
+        if (str_contains($errorString, 'Error on updating manifest cache')) {
             return true;
         }
 
