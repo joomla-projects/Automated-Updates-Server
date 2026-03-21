@@ -80,7 +80,7 @@ class SiteController extends Controller
         $site = Site::where('url', $url)
             ->get()
             ->first(function ($site) use ($key) {
-                return $site->key === $key;
+                return (string) $site->key === (string) $key;
             });
 
         if (!$site) {
@@ -112,7 +112,7 @@ class SiteController extends Controller
         $site = Site::where('url', $url)
             ->get()
             ->first(function ($site) use ($key) {
-                return $site->key === $key;
+                return (string) $site->key === (string) $key;
             });
 
         if (!$site) {
