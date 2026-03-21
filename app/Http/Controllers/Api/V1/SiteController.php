@@ -77,10 +77,13 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        try {
-            /** @var Site $site */
-            $site = Site::where('url', $url)->where('key', $key)->firstOrFail();
-        } catch (\Exception $e) {
+        $site = Site::where('url', $url)
+            ->get()
+            ->first(function ($site) use ($key) {
+                return $site->key === $key;
+            });
+
+        if (!$site) {
             return $this->error("Not found", 404);
         }
 
@@ -106,9 +109,13 @@ class SiteController extends Controller
         $url = $request->string('url');
         $key = $request->string('key');
 
-        try {
-            $site = Site::where('url', $url)->where('key', $key)->firstOrFail();
-        } catch (\Exception $e) {
+        $site = Site::where('url', $url)
+            ->get()
+            ->first(function ($site) use ($key) {
+                return $site->key === $key;
+            });
+
+        if (!$site) {
             return $this->error("Not found", 404);
         }
 
