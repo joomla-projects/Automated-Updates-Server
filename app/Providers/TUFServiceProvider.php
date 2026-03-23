@@ -6,7 +6,6 @@ use App\Models\TufMetadata;
 use App\TUF\EloquentModelStorage;
 use App\TUF\HttpLoader;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use Tuf\Client\Updater;
 use Tuf\Loader\SizeCheckingLoader;
@@ -27,7 +26,11 @@ class TUFServiceProvider extends ServiceProvider
             // Setup loader
             $httpLoader = new HttpLoader(
                 self::REPO_PATH,
-                App::make(Client::class)
+                new Client([
+                    'headers'         => [
+                        'User-Agent' => 'Joomla.org Automated Updates Server'
+                    ]
+                ])
             );
 
             $sizeCheckingLoader = new SizeCheckingLoader($httpLoader);
