@@ -224,11 +224,21 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         }
 
         // Clean up restore
-        $connection->performExtractionRequest(
-            [
-                "task" => "finalizeUpdate"
-            ]
-        );
+        try {
+            $connection->performExtractionRequest(
+                [
+                    "task" => "finalizeUpdate"
+                ]
+            );
+        } catch (RequestException $e) {
+            // Joomla's postinstall script does push deletion errors to the output buffer, that's causing false psoitives
+            if (str_contains((string) $e->getResponse()?->getBody(), 'Error on deleting file or folder')) {
+                return;
+            }
+
+            throw $e;
+        }
+
     }
 
     public function failed(\Exception $exception): void
