@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Network\NetworkHelper;
 use App\RemoteSite\Connection;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
@@ -38,7 +39,18 @@ class Site extends Model
 
     public function getUrlAttribute(string $value): string
     {
-        return rtrim($value, "/");
+        $url = rtrim($value, "/");
+
+        $networkHelper = App::make(NetworkHelper::class);
+
+        // Revalidate current DNS resolution on every usage
+        if (!$networkHelper->isValidRemoteHost(
+            (string) parse_url($value, PHP_URL_HOST)
+        )) {
+            throw new \RuntimeException("Invalid URL provided");
+        }
+
+        return $url;
     }
 
     public function getConnectionAttribute(): Connection

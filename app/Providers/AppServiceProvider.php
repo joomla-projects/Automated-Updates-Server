@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Network\DNSLookup;
+use App\Network\NetworkHelper;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
             $siteIpLimits = [];
 
             if ($siteHost !== 'default') {
-                $siteIps = (new DNSLookup())->getIPs($siteHost);
+                $siteIps = (new NetworkHelper())->getIPs($siteHost);
 
                 foreach ($siteIps as $siteIp) {
                     $siteIpLimits[] = Limit::perMinute(5)->by("siteip-" . $siteIp);
