@@ -48,6 +48,7 @@ class TufFetcher
             }
         );
 
+        // @phpstan-ignore-next-line
         if (!$releases instanceof Collection) {
             throw new MetadataException("Invalid release list");
         }
