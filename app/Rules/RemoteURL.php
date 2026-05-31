@@ -2,7 +2,7 @@
 
 namespace App\Rules;
 
-use App\Network\DNSLookup;
+use App\Network\NetworkHelper;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\App;
@@ -23,23 +23,12 @@ class RemoteURL implements ValidationRule
         }
 
         $host = (string) parse_url($value, PHP_URL_HOST);
-        $ips = App::make(DNSLookup::class)->getIPs($host);
+        /** @var NetworkHelper $networkHelper */
+        $networkHelper = App::make(NetworkHelper::class);
 
-        // Could not resolve given address
-        if (count($ips) === 0) {
-            $fail("Invalid URL: unresolvable site URL.");
-        }
-
-        // Check each resolved IP
-        foreach ($ips as $ip) {
-            if (!filter_var(
-                $ip,
-                FILTER_VALIDATE_IP,
-                FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE
-            )
-            ) {
-                $fail("Invalid URL: local address are disallowed as site URL.");
-            }
+        // Check IPs
+        if (!$networkHelper->isValidRemoteHost($host)) {
+            $fail("Invalid URL: please provide a valid, resolvable Host that does not resolve to local IPs.");
         }
     }
 }

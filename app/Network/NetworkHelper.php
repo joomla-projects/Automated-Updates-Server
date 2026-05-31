@@ -2,7 +2,7 @@
 
 namespace App\Network;
 
-class DNSLookup
+class NetworkHelper
 {
     public function getIPs(string $hostname): array
     {
@@ -25,5 +25,36 @@ class DNSLookup
         }
 
         return $ips;
+    }
+
+    public function isValidRemoteHost(string $hostname): bool
+    {
+        $ips = $this->getIPs($hostname);
+
+        if (!count($ips)) {
+            return false;
+        }
+
+        // Check each resolved IP
+        foreach ($ips as $ip) {
+            if (!$this->isValidRemoteIp($ip)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function isValidRemoteIp(string $ip): bool
+    {
+        if (!filter_var(
+            $ip,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE
+        )) {
+            return false;
+        }
+
+        return true;
     }
 }
