@@ -21,6 +21,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
     use Queueable;
     protected ?int $preUpdateCode = null;
     public int $uniqueFor = 3600;
+    public int $tries = 1;
     public int $timeout = 120;
 
     /**
@@ -140,10 +141,15 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         }
 
         // Run the postupdate steps
-        if (!$connection->finalizeUpdate(["fromVersion" => $healthResult->cms_version])->success) {
+        $postUpdateResult = $connection->finalizeUpdate([
+            "fromVersion" => $healthResult->cms_version,
+            "updateFileName" => $prepareResult->filename,
+        ]);
+
+        if (!$postUpdateResult->success && !$postUpdateResult->hasIgnorableError()) {
             throw new UpdateException(
                 "finalize",
-                "Update for site failed in postprocessing: " . $this->site->id
+                "Update for site failed in postprocessing: " . $this->site->id . ", errors: " . json_encode($postUpdateResult->errors),
             );
         }
 
@@ -219,11 +225,21 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         }
 
         // Clean up restore
-        $connection->performExtractionRequest(
-            [
-                "task" => "finalizeUpdate"
-            ]
-        );
+        try {
+            $connection->performExtractionRequest(
+                [
+                    "task" => "finalizeUpdate"
+                ]
+            );
+        } catch (RequestException $e) {
+            // Joomla's postinstall script does push deletion errors to the output buffer, that's causing false psoitives
+            if (str_contains((string) $e->getResponse()?->getBody(), 'Error on deleting file or folder')) {
+                return;
+            }
+
+            throw $e;
+        }
+
     }
 
     public function failed(\Exception $exception): void

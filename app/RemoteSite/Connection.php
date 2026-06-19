@@ -17,13 +17,14 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Psr\Http\Message\RequestInterface;
 
 /**
  * @method  HealthCheckResponse checkHealth()
  * @method  GetUpdateResponse getUpdate()
  * @method  PrepareUpdateResponse prepareUpdate(array<string,string> $data)
- * @method  FinalizeUpdateResponse finalizeUpdate(array<string,string> $data)
+ * @method  FinalizeUpdateResponse finalizeUpdate(array<string,string|null> $data)
  * @method  NotificationResponse notificationSuccess(array<string,string> $data)
  * @method  NotificationResponse notificationFailed(array<string,string> $data)
  */
@@ -163,9 +164,13 @@ class Connection
 
     protected function decodeResponse(Response $response, Request $request): array
     {
+        // Work around debug bar issue https://github.com/joomla/joomla-cms/issues/47597
+        $body = Str::of((string) $response->getBody())
+            ->before('<!-- Could not find template &quot;system&quot;. (500 Whoops, looks like something went wrong.) -->');
+
         // Decode
         $data = json_decode(
-            (string) $response->getBody(),
+            $body->toString(),
             true,
             512,
             JSON_THROW_ON_ERROR

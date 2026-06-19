@@ -28,11 +28,11 @@ class RemoteURLTest extends TestCase
     public static function urlDataProvider(): array
     {
         return [
-            ['https://127.0.0.1', false, 'Invalid URL: local address are disallowed as site URL.'],
-            ['https://localhost', false, 'Invalid URL: local address are disallowed as site URL.'],
-            ['https://10.0.0.1', false, 'Invalid URL: local address are disallowed as site URL.'],
-            ['https://joomla.org', true, ''],
-            ['https://invalid.host.tld', false,'Invalid URL: unresolvable site URL.'],
+            ['https://127.0.0.1', false, 'Invalid URL: please provide a valid, resolvable Host that does not resolve to local IPs.'],
+            ['https://localhost', false, 'Invalid URL: please provide a valid, resolvable Host that does not resolve to local IPs.'],
+            ['https://10.0.0.1', false, 'Invalid URL: please provide a valid, resolvable Host that does not resolve to local IPs.'],
+            ['https://invalid.host.tld', false,'Invalid URL: please provide a valid, resolvable Host that does not resolve to local IPs.'],
+            ['https://joomla.org', true, '']
         ];
     }
 }

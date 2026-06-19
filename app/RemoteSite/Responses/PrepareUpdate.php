@@ -8,7 +8,8 @@ class PrepareUpdate extends BaseDTO implements ResponseInterface
 {
     public function __construct(
         public string $password,
-        public int $filesize
+        public int $filesize,
+        public ?string $filename = null
     ) {
     }
 }
