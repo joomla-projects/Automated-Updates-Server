@@ -190,7 +190,7 @@ return [
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
-            'timeout' => 15,
+            'timeout' => 10,
             'nice' => 0,
         ],
         'supervisor-updates' => [
@@ -203,7 +203,7 @@ return [
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
-            'timeout' => 600,
+            'timeout' => 300,
             'nice' => 0,
         ],
     ],
@@ -211,7 +211,7 @@ return [
     'environments' => [
         'production' => [
             'supervisor-default' => [
-                'maxProcesses' => 20,
+                'maxProcesses' => 40,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],

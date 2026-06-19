@@ -20,6 +20,7 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
     public int $tries = 1;
 
     public int $uniqueFor = 120;
+    public int $timeout = 10;
 
     /**
      * Create a new job instance.

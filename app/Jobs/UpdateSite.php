@@ -22,6 +22,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
     protected ?int $preUpdateCode = null;
     public int $uniqueFor = 3600;
     public int $tries = 1;
+    public int $timeout = 120;
 
     /**
      * Create a new job instance.
