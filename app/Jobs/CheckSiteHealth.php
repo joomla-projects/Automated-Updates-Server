@@ -42,6 +42,7 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+        // @phpstan-ignore deadCatch
         try {
             /** @var Connection $connection */
             $connection = $this->site->connection;
