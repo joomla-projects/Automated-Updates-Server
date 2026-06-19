@@ -47,7 +47,7 @@ class Site extends Model
         if (!$networkHelper->isValidRemoteHost(
             (string) parse_url($value, PHP_URL_HOST)
         )) {
-            throw new \RuntimeException("Invalid URL provided");
+            throw new \RuntimeException("Invalid URL provided: " . $value);
         }
 
         return $url;
