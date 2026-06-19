@@ -35,10 +35,11 @@ class QueueHealthChecks extends Command
 
         Site::query()
             ->where(
-                'last_seen',
+                'next_check',
                 '<',
-                Carbon::now()->subHours((int) config('autoupdates.healthcheck_interval')) // @phpstan-ignore-line
+                Carbon::now()
             )
+            ->orWhereNull('next_check')
             ->chunkById(
                 100,
                 function (Collection $chunk) {
