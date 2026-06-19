@@ -42,8 +42,12 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        /** @var Connection $connection */
-        $connection = $this->site->connection;
+        try {
+            /** @var Connection $connection */
+            $connection = $this->site->connection;
+        } catch (\Throwable $exception) {
+            return;
+        }
 
         $healthData = $connection->checkHealth();
 
