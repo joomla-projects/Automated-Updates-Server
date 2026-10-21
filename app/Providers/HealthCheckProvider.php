@@ -27,7 +27,7 @@ class HealthCheckProvider extends ServiceProvider
     public function boot(): void
     {
         Health::checks([
-            UsedDiskSpaceCheck::new(),
+            UsedDiskSpaceCheck::new()->warnWhenUsedSpaceIsAbovePercentage(80)->failWhenUsedSpaceIsAbovePercentage(95),
             DatabaseCheck::new(),
             HorizonCheck::new(),
             QueueLengthCheck::new(),

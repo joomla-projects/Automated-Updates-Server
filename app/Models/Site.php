@@ -32,6 +32,7 @@ class Site extends Model
     {
         return [
             'last_seen' => 'datetime',
+            'next_check' => 'datetime',
             'update_requirement_state' => 'bool',
             'key' => 'encrypted'
         ];

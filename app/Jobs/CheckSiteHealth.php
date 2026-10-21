@@ -45,13 +45,12 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
         try {
             /** @var Connection $connection */
             $connection = $this->site->connection;
-
-            // @phpstan-ignore-next-line
+            $healthData = $connection->checkHealth();
         } catch (\Throwable $exception) {
+            $this->site->next_check = Carbon::now()->addHours((int) config('autoupdates.healthcheck_interval')); // @phpstan-ignore-line
+            $this->site->save();
             return;
         }
-
-        $healthData = $connection->checkHealth();
 
         // Write updated data to DB
         $this->site->fill(
@@ -60,6 +59,7 @@ class CheckSiteHealth implements ShouldQueue, ShouldBeUnique
 
         // @phpstan-ignore-next-line
         $this->site->last_seen = Carbon::now();
+        $this->site->next_check = Carbon::now()->addHours((int) config('autoupdates.healthcheck_interval')); // @phpstan-ignore-line
         $this->site->save();
 
         // Check if conditions are met
