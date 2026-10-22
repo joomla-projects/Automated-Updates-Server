@@ -15,6 +15,7 @@ RUN apt-get update \
         mysqli \
         curl \
         zip \
+        pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get purge -y --auto-remove \
