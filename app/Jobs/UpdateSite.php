@@ -9,6 +9,7 @@ use App\Models\Site;
 use App\RemoteSite\Connection;
 use App\RemoteSite\Responses\PrepareUpdate;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -97,7 +98,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
             $this->preUpdateCode = $this->site->getFrontendStatus();
         } catch (RequestException $e) {
             // Catch request exceptions - they should not stop the process
-            $this->preUpdateCode = $e->getResponse()?->getStatusCode();
+            $this->preUpdateCode = $e instanceof ResponseException ? $e->getResponse()->getStatusCode() : null;
         }
 
         // Let site fetch available updates
@@ -158,7 +159,7 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
             $afterUpdateCode = $this->site->getFrontendStatus();
         } catch (RequestException $e) {
             // Again, do not fetch exceptions
-            $afterUpdateCode = $e->getResponse()?->getStatusCode();
+            $afterUpdateCode = $e instanceof ResponseException ? $e->getResponse()->getStatusCode() : null;
         }
 
         if ($afterUpdateCode !== $this->preUpdateCode) {
@@ -231,9 +232,9 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
                     "task" => "finalizeUpdate"
                 ]
             );
-        } catch (RequestException $e) {
+        } catch (ResponseException $e) {
             // Joomla's postinstall script does push deletion errors to the output buffer, that's causing false psoitives
-            if (str_contains((string) $e->getResponse()?->getBody(), 'Error on deleting file or folder')) {
+            if (str_contains((string) $e->getResponse()->getBody(), 'Error on deleting file or folder')) {
                 return;
             }
 
@@ -258,12 +259,12 @@ class UpdateSite implements ShouldQueue, ShouldBeUnique
         $failedTrace = $exception->getTraceAsString();
 
         // Log response body
-        if ($exception instanceof RequestException) {
-            $failedMessage .= "\n Response Body: " . $exception->getResponse()?->getBody();
+        if ($exception instanceof ResponseException) {
+            $failedMessage .= "\n Response Body: " . $exception->getResponse()->getBody();
         }
 
-        if ($exception->getPrevious() instanceof RequestException) {
-            $failedMessage .= "\n Response Body: " . $exception->getPrevious()->getResponse()?->getBody();
+        if ($exception->getPrevious() instanceof ResponseException) {
+            $failedMessage .= "\n Response Body: " . $exception->getPrevious()->getResponse()->getBody();
         }
 
         // Notify users
