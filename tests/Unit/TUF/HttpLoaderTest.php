@@ -4,7 +4,7 @@ namespace Tests\Unit\TUF;
 
 use App\TUF\HttpLoader;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
@@ -69,7 +69,7 @@ class HttpLoaderTest extends TestCase
             $httpClientMock->expects($this->once())
                 ->method('get')
                 ->with(self::REPOPATHMOCK . $expectedFile)
-                ->willThrowException(new RequestException(
+                ->willThrowException(new ResponseException(
                     "Request Exception",
                     new Request('GET', self::REPOPATHMOCK . $expectedFile),
                     new Response($responseCode)
