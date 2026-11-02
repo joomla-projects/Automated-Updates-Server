@@ -6,11 +6,11 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "guzzlehttp/guzzle": "^7.9.3",
-        "laravel/framework": "^13",
+        "guzzlehttp/guzzle": "8.0.1.0",
+        "laravel/framework": "13.30.0.0",
         "laravel/horizon": "^v5.50.1",
         "laravel/tinker": "^3.0",
-        "php-tuf/php-tuf": "1.0.1",
+        "php-tuf/php-tuf": "1.1.0",
         "spatie/cpu-load-health-check": "^1.0",
         "spatie/laravel-health": "^1.40"
     },
