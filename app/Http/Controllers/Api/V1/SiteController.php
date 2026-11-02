@@ -56,6 +56,7 @@ class SiteController extends Controller
         $site->key = $key;
         $site->url = $url;
         $site->last_seen = Carbon::now();
+        $site->next_check = Carbon::now()->addHours((int) config('autoupdates.healthcheck_interval')); // @phpstan-ignore-line
 
         // Fill with site info
         $site->fill($healthResponse->toArray());
