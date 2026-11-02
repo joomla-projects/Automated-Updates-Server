@@ -29,5 +29,13 @@ The update server has multiple manual operations available that can be triggered
 | app:perform-update {siteId}    | Runs an update job for a given site ID.                                                                                   |
 | app:queue-updates              | Triggers update jobs for a given number of sites. Runs in interactive mode and queries target version and number of sites |
 
+## Web Bot Auth
+Outgoing requests can be signed with [Web Bot Auth](https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/), so sites behind Cloudflare can recognize the server as a verified bot.
+
+* Generate the private key: `docker-compose run --entrypoint="php artisan web-bot-auth:generate-key" php-fpm` - it's written to `storage/web-bot-auth.key` (or `WEB_BOT_AUTH_KEY_PATH`). Keep it secret, it's excluded from git.
+* Set `WEB_BOT_AUTH_ENABLED=true` and `WEB_BOT_AUTH_SIGNATURE_AGENT` (defaults to `APP_URL`) to the public https origin of the server.
+* The signed key directory is then served at `/.well-known/http-message-signatures-directory`.
+* Register the directory URL in the Cloudflare dashboard (Manage Account > Configurations > Bot Submission Form, verification method "Request Signature").
+
 ## Queue Monitoring
 A monitoring dashboard for the queue is available on the selected HTTP port via `domain.tld/horizion`. It's protected with basic auth, credentials are defined in the .env file.
