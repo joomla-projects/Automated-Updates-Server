@@ -8,6 +8,7 @@ This is the server for automated updates of Joomla CMS instances running on joom
 * Start the webserver and DB services:  `docker-compose -f docker-compose.prod.yml up -d` 
 * Apply the database migrations: `docker-compose run --entrypoint="php artisan migrate" php-fpm`
 * Daemonize the queue worker, i.e. by using supervisord; the call in question is: `docker-compose run --entrypoint="php artisan horizon" php-fpm`
+  * Horizon workers are forked from a shared template by [tevkert/queue-prefork](https://github.com/tevkert/queue-prefork) to reduce memory usage. This only works if Horizon does **not** run as PID 1 inside the container, so the `php-fpm` service in `docker-compose.prod.yml` needs `init: true` (`docker-compose run` has no `--init` flag, but it honours the service setting). Without an init, Horizon silently runs in stock mode. Check with `php artisan queue-prefork:doctor` and `php artisan queue-prefork:status` inside the container.
 * Add a cron job to execute the task scheduler. The scheduler should be trigger every 5min, the call is: `docker-compose run --entrypoint="php artisan schedule:run" php-fpm`
 
 ## Periodic operations
@@ -28,6 +29,14 @@ The update server has multiple manual operations available that can be triggered
 | app:check-site-health {siteId} | Runs a health check for a given site ID.                                                                                  |
 | app:perform-update {siteId}    | Runs an update job for a given site ID.                                                                                   |
 | app:queue-updates              | Triggers update jobs for a given number of sites. Runs in interactive mode and queries target version and number of sites |
+
+## Web Bot Auth
+Outgoing requests can be signed with [Web Bot Auth](https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/), so sites behind Cloudflare can recognize the server as a verified bot.
+
+* Generate the private key: `docker-compose run --entrypoint="php artisan web-bot-auth:generate-key" php-fpm` - it's written to `storage/web-bot-auth.key` (or `WEB_BOT_AUTH_KEY_PATH`). Keep it secret, it's excluded from git.
+* Set `WEB_BOT_AUTH_ENABLED=true` and `WEB_BOT_AUTH_SIGNATURE_AGENT` (defaults to `APP_URL`) to the public https origin of the server.
+* The signed key directory is then served at `/.well-known/http-message-signatures-directory`.
+* Register the directory URL in the Cloudflare dashboard (Manage Account > Configurations > Bot Submission Form, verification method "Request Signature").
 
 ## Queue Monitoring
 A monitoring dashboard for the queue is available on the selected HTTP port via `domain.tld/horizion`. It's protected with basic auth, credentials are defined in the .env file.

@@ -4,7 +4,8 @@ namespace App\TUF;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Exception\ResponseException;
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use Tuf\Exception\RepoFileNotFound;
 use Tuf\Loader\LoaderInterface;
@@ -19,11 +20,14 @@ class HttpLoader implements LoaderInterface
     {
         try {
             $response = $this->http->get($this->repositoryPath . $locator);
-        } catch (RequestException $e) {
-            if ($e->getResponse()?->getStatusCode() !== 200) {
+        } catch (ResponseException $e) {
+            if ($e->getResponse()->getStatusCode() !== 200) {
                 throw new RepoFileNotFound();
             }
 
+            throw new HttpLoaderException($e->getMessage(), $e->getCode(), $e);
+        } catch (RequestException $e) {
+            // Request failed without a response
             throw new HttpLoaderException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -31,6 +35,6 @@ class HttpLoader implements LoaderInterface
         $response->getBody()->rewind();
 
         // Return response
-        return Create::promiseFor($response->getBody());
+        return new FulfilledPromise($response->getBody());
     }
 }

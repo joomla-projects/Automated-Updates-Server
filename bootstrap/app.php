@@ -1,12 +1,10 @@
 <?php
 
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\ResponseException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -26,11 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(remove: [
             StartSession::class,
             ShareErrorsFromSession::class,
-            ValidateCsrfToken::class,
+            PreventRequestForgery::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->report(function (ServerException|ClientException|RequestException $e) {
+        $exceptions->report(function (ResponseException $e) {
             Log::warning('HTTP Request Exception', [
                 'url' => (string) $e->getRequest()->getUri(),
                 'status' => $e->getResponse()->getStatusCode(),

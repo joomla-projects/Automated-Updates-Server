@@ -12,7 +12,7 @@ use App\RemoteSite\Responses\PrepareUpdate as PrepareUpdateResponse;
 use App\RemoteSite\Responses\Notification as NotificationResponse;
 use App\RemoteSite\Responses\ResponseInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
@@ -106,7 +106,7 @@ class Connection
 
         // Make sure it matches the Joomla webservice response format
         if (empty($responseData['data']['attributes'])) {
-            throw new RequestException(
+            throw new ResponseException(
                 "Invalid JSON format",
                 $request,
                 $response
@@ -152,7 +152,7 @@ class Connection
 
         // Validate response
         if (!json_validate((string) $response->getBody())) {
-            throw new RequestException(
+            throw new ResponseException(
                 "Invalid JSON body",
                 $request,
                 $response
@@ -178,7 +178,7 @@ class Connection
 
         // Make sure it's an array
         if (!is_array($data)) {
-            throw new RequestException(
+            throw new ResponseException(
                 "Invalid JSON body",
                 $request,
                 $response

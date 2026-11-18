@@ -11,9 +11,11 @@ trait RequestTargetVersion
     {
         $releases = (new TufFetcher())->getReleases();
 
+        $versions = $releases->map(fn (ReleaseData $release): string => $release->version)->values()->all();
+
         return $this->choice( // @phpstan-ignore-line
             "What's the target version?",
-            $releases->map(fn (ReleaseData $release) => $release->version)->values()->toArray()
+            $versions
         );
     }
 }
