@@ -13,7 +13,7 @@
         "php-tuf/php-tuf": "1.1.0",
         "spatie/cpu-load-health-check": "^1.0",
         "spatie/laravel-health": "^1.40",
-        "tevkert/queue-prefork": "^1.0"
+        "tevkert/queue-prefork": "1.0.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
