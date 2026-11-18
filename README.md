@@ -8,6 +8,7 @@ This is the server for automated updates of Joomla CMS instances running on joom
 * Start the webserver and DB services:  `docker-compose -f docker-compose.prod.yml up -d` 
 * Apply the database migrations: `docker-compose run --entrypoint="php artisan migrate" php-fpm`
 * Daemonize the queue worker, i.e. by using supervisord; the call in question is: `docker-compose run --entrypoint="php artisan horizon" php-fpm`
+  * Horizon workers are forked from a shared template by [tevkert/queue-prefork](https://github.com/tevkert/queue-prefork) to reduce memory usage. This only works if Horizon does **not** run as PID 1 inside the container, so the `php-fpm` service in `docker-compose.prod.yml` needs `init: true` (`docker-compose run` has no `--init` flag, but it honours the service setting). Without an init, Horizon silently runs in stock mode. Check with `php artisan queue-prefork:doctor` and `php artisan queue-prefork:status` inside the container.
 * Add a cron job to execute the task scheduler. The scheduler should be trigger every 5min, the call is: `docker-compose run --entrypoint="php artisan schedule:run" php-fpm`
 
 ## Periodic operations
