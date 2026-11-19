@@ -7,3 +7,5 @@ Route::get('/', function () {
 });
 
 Route::get('/.well-known/http-message-signatures-directory', WebBotAuthDirectoryController::class);
+
+Route::view('/bot', 'bot');
